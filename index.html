@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IMPREXA MX — Imprenta digital y offset</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #121110;
+    --surface: #1b1917;
+    --surface-2: #242220;
+    --text: #f3efe8;
+    --muted: #9c948a;
+    --accent: #ff4612;
+    --cyan: #00aeef;
+    --magenta: #ec008c;
+    --yellow: #ffe200;
+    --line: rgba(243,239,232,0.12);
+    --line-strong: rgba(243,239,232,0.22);
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+
+  html{scroll-behavior:smooth;}
+
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  img,svg{display:block;}
+
+  a{color:inherit;text-decoration:none;}
+
+  ::selection{background:var(--accent);color:#121110;}
+
+  .display{
+    font-family:'Archivo Black', sans-serif;
+    text-transform:uppercase;
+    letter-spacing:-0.01em;
+    line-height:0.95;
+  }
+
+  .mono{
+    font-family:'IBM Plex Mono', monospace;
+    letter-spacing:0.04em;
+  }
+
+  .wrap{
+    max-width:1180px;
+    margin:0 auto;
+    padding:0 24px;
+  }
+
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--accent);
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+
+  .eyebrow::before{
+    content:"";
+    width:18px;height:1px;
+    background:var(--accent);
+  }
+
+  /* registration mark, used as a recurring graphic motif */
+  .regmark{
+    width:18px;height:18px;
+    flex-shrink:0;
+  }
+  .regmark circle{fill:none;stroke:currentColor;stroke-width:1.4;}
+  .regmark line{stroke:currentColor;stroke-width:1.4;}
+
+  /* halftone texture */
+  .halftone{
+    position:absolute;
+    inset:0;
+    background-image:radial-gradient(circle, rgba(243,239,232,0.16) 1px, transparent 1.4px);
+    background-size:14px 14px;
+    mask-image:linear-gradient(to bottom, black, transparent 85%);
+    pointer-events:none;
+  }
+
+  section{position:relative;}
+
+  /* ---------- header ---------- */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:rgba(18,17,16,0.86);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{
+    display:flex;align-items:center;justify-content:space-between;
+    height:72px;
+  }
+  .logo{
+    font-family:'Archivo Black', sans-serif;
+    font-size:19px;
+    letter-spacing:0.01em;
+    display:flex;align-items:center;gap:8px;
+  }
+  .logo .dot{width:8px;height:8px;background:var(--accent);border-radius:1px;}
+  .nav-links{
+    display:flex;gap:36px;
+    font-size:14px;font-weight:500;
+  }
+  .nav-links a{
+    color:var(--muted);
+    transition:color .2s;
+    position:relative;
+  }
+  .nav-links a:hover{color:var(--text);}
+  .nav-cta{
+    font-size:13px;font-weight:600;
+    padding:10px 18px;
+    border:1px solid var(--line-strong);
+    border-radius:2px;
+    transition:border-color .2s, background .2s;
+  }
+  .nav-cta:hover{border-color:var(--accent);background:rgba(255,70,18,0.08);}
+  .nav-toggle{display:none;background:none;border:none;color:var(--text);cursor:pointer;}
+
+  @media (max-width:760px){
+    .nav-links{display:none;}
+    .nav-toggle{display:block;}
+  }
+
+  /* ---------- hero ---------- */
+  .hero{
+    padding:120px 0 90px;
+    overflow:hidden;
+    border-bottom:1px solid var(--line);
+  }
+  .marquee{
+    position:absolute;
+    top:42px;left:0;right:0;
+    white-space:nowrap;
+    overflow:hidden;
+    pointer-events:none;
+  }
+  .marquee-track{
+    display:inline-block;
+    font-family:'Archivo Black', sans-serif;
+    font-size:120px;
+    color:transparent;
+    -webkit-text-stroke:1px rgba(243,239,232,0.07);
+    animation:scroll-left 32s linear infinite;
+  }
+  @keyframes scroll-left{
+    from{transform:translateX(0);}
+    to{transform:translateX(-50%);}
+  }
+  .hero-inner{position:relative;z-index:2;max-width:760px;}
+  .hero h1{
+    font-size:clamp(48px, 8vw, 92px);
+    margin:18px 0 22px;
+  }
+  .hero h1 span{color:var(--accent);}
+  .hero p{
+    color:var(--muted);
+    font-size:17px;
+    max-width:520px;
+    margin-bottom:36px;
+  }
+  .btn-row{display:flex;gap:14px;flex-wrap:wrap;}
+  .btn{
+    font-size:14px;font-weight:700;
+    padding:15px 26px;
+    border-radius:2px;
+    display:inline-flex;align-items:center;gap:10px;
+    transition:transform .15s, opacity .15s;
+  }
+  .btn:active{transform:scale(0.98);}
+  .btn-primary{background:var(--accent);color:#121110;}
+  .btn-primary:hover{opacity:0.88;}
+  .btn-outline{border:1px solid var(--line-strong);color:var(--text);}
+  .btn-outline:hover{border-color:var(--text);}
+
+  .corner-mark{
+    position:absolute;
+    color:var(--muted);
+    opacity:0.5;
+  }
+  .corner-mark.tr{top:48px;right:24px;}
+
+  /* ---------- section heads ---------- */
+  .section-head{
+    margin-bottom:54px;
+    max-width:640px;
+  }
+  .section-head h2{
+    font-size:clamp(30px,4vw,44px);
+    margin-top:14px;
+  }
+  .section-head h2 em{font-style:normal;color:var(--accent);}
+
+  section.pad{padding:96px 0;border-bottom:1px solid var(--line);}
+
+  /* ---------- features ---------- */
+  .feature-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+  }
+  .feature{
+    background:var(--bg);
+    padding:34px 28px;
+    min-height:200px;
+    display:flex;flex-direction:column;justify-content:space-between;
+  }
+  .feature-badge{
+    width:38px;height:38px;
+    border:1px solid var(--line-strong);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    margin-bottom:24px;
+    position:relative;
+  }
+  .feature-badge::before,.feature-badge::after{
+    content:"";position:absolute;background:var(--line-strong);
+  }
+  .feature h3{font-size:17px;margin-bottom:10px;}
+  .feature p{color:var(--muted);font-size:14px;}
+
+  @media (max-width:860px){
+    .feature-grid{grid-template-columns:1fr 1fr;}
+  }
+  @media (max-width:560px){
+    .feature-grid{grid-template-columns:1fr;}
+  }
+
+  /* ---------- process ---------- */
+  .process{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:0;
+    counter-reset:step;
+  }
+  .step{
+    padding:28px 20px 0;
+    border-top:2px solid var(--line-strong);
+    position:relative;
+  }
+  .step-num{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;
+    color:var(--accent);
+    margin-bottom:14px;
+    display:block;
+  }
+  .step h4{font-size:15px;margin-bottom:8px;}
+  .step p{font-size:13px;color:var(--muted);}
+  .step:not(:last-child)::after{
+    content:"→";
+    position:absolute;
+    right:-10px;top:24px;
+    color:var(--muted);
+    font-size:14px;
+  }
+  @media (max-width:860px){
+    .process{grid-template-columns:1fr 1fr;gap:32px 20px;}
+    .step:not(:last-child)::after{display:none;}
+  }
+  @media (max-width:560px){.process{grid-template-columns:1fr;}}
+
+  /* ---------- social proof ---------- */
+  .stat-row{
+    display:flex;gap:48px;
+    margin-bottom:56px;
+    flex-wrap:wrap;
+  }
+  .stat .num{font-family:'Archivo Black',sans-serif;font-size:40px;}
+  .stat .num.accent{color:var(--accent);}
+  .stat .label{font-size:13px;color:var(--muted);margin-top:4px;}
+
+  .subhead-row{
+    display:flex;align-items:baseline;gap:12px;
+    margin:48px 0 22px;
+  }
+  .subhead-row .mono{color:var(--accent);font-size:13px;}
+  .subhead-row h3{font-size:18px;}
+
+  .review-scroll{
+    display:flex;gap:16px;
+    overflow-x:auto;
+    padding-bottom:12px;
+    scrollbar-width:thin;
+  }
+  .review-card{
+    flex:0 0 300px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    padding:24px;
+  }
+  .review-top{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+  .avatar{
+    width:38px;height:38px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;
+    color:#121110;
+  }
+  .review-name{font-size:13px;font-weight:600;}
+  .review-tag{font-size:11px;color:var(--muted);}
+  .stars{color:var(--yellow);font-size:12px;letter-spacing:2px;margin-bottom:10px;}
+  .review-card p{font-size:13.5px;color:var(--muted);}
+
+  .comment-grid{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:14px;
+  }
+  .comment{
+    background:var(--surface);
+    border:1px solid var(--line);
+    padding:16px 18px;
+    font-size:13px;
+  }
+  .comment .who{font-weight:600;font-size:12.5px;margin-bottom:4px;}
+  .comment .who span{color:var(--yellow);margin-left:6px;font-size:11px;}
+  .comment p{color:var(--muted);}
+  @media (max-width:760px){.comment-grid{grid-template-columns:1fr 1fr;}}
+  @media (max-width:540px){.comment-grid{grid-template-columns:1fr;}}
+
+  .gallery-strip{
+    display:grid;
+    grid-template-columns:repeat(8,1fr);
+    gap:8px;
+  }
+  .gallery-tile{
+    aspect-ratio:9/13;
+    background:linear-gradient(135deg, var(--surface-2), var(--surface));
+    border:1px solid var(--line);
+    position:relative;
+    overflow:hidden;
+  }
+  .gallery-tile::after{
+    content:"▶";
+    position:absolute;inset:0;
+    display:flex;align-items:center;justify-content:center;
+    color:rgba(243,239,232,0.3);
+    font-size:11px;
+  }
+  @media (max-width:860px){.gallery-strip{grid-template-columns:repeat(4,1fr);}}
+  @media (max-width:540px){.gallery-strip{grid-template-columns:repeat(3,1fr);}}
+
+  /* ---------- table ---------- */
+  table{width:100%;border-collapse:collapse;font-size:14px;}
+  thead th{
+    text-align:left;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:var(--muted);
+    padding:14px 16px;
+    border-bottom:1px solid var(--line-strong);
+  }
+  thead th.win{color:var(--accent);}
+  tbody td{
+    padding:18px 16px;
+    border-bottom:1px solid var(--line);
+    color:var(--muted);
+  }
+  tbody td.win{color:var(--text);font-weight:600;}
+  tbody tr td:first-child{color:var(--text);font-weight:500;}
+  .col-win{background:rgba(255,70,18,0.06);}
+
+  /* ---------- ink mixer ---------- */
+  .mixer{
+    display:grid;
+    grid-template-columns:1fr 320px;
+    gap:60px;
+    align-items:center;
+  }
+  .sliders{display:flex;flex-direction:column;gap:22px;}
+  .slider-row{display:grid;grid-template-columns:24px 1fr 44px;align-items:center;gap:14px;}
+  .ink-dot{width:14px;height:14px;border-radius:50%;}
+  .ink-dot.c{background:var(--cyan);}
+  .ink-dot.m{background:var(--magenta);}
+  .ink-dot.y{background:var(--yellow);}
+  .ink-dot.k{background:var(--text);}
+  input[type=range]{
+    -webkit-appearance:none;
+    width:100%;height:2px;
+    background:var(--line-strong);
+    outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:14px;height:14px;
+    border-radius:50%;
+    background:var(--text);
+    cursor:pointer;
+    border:2px solid var(--bg);
+  }
+  .slider-val{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);text-align:right;}
+  .swatch-box{
+    aspect-ratio:1;
+    border:1px solid var(--line-strong);
+    position:relative;
+  }
+  #swatch{width:100%;height:100%;transition:background .1s;}
+  .swatch-caption{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;color:var(--muted);
+    margin-top:12px;
+    text-align:center;
+  }
+
+  /* ---------- specs ---------- */
+  .spec-grid{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+    background:var(--line);border:1px solid var(--line);
+  }
+  .spec-col{background:var(--bg);padding:28px;}
+  .spec-col h4{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;color:var(--accent);
+    text-transform:uppercase;letter-spacing:0.08em;
+    margin-bottom:16px;
+  }
+  .spec-col ul{list-style:none;font-size:13.5px;color:var(--muted);}
+  .spec-col li{padding:7px 0;border-top:1px solid var(--line);}
+  .spec-col li:first-child{border-top:none;}
+  @media (max-width:860px){.spec-grid{grid-template-columns:1fr 1fr;}}
+  @media (max-width:540px){.spec-grid{grid-template-columns:1fr;}}
+
+  /* ---------- cta ---------- */
+  .cta-section{
+    padding:96px 0;
+    text-align:center;
+  }
+  .cta-section h2{font-size:clamp(34px,6vw,56px);margin-bottom:16px;}
+  .price-row{
+    display:flex;justify-content:center;align-items:baseline;gap:10px;
+    margin:26px 0 8px;
+  }
+  .price-row .from{font-size:13px;color:var(--muted);}
+  .price-row .amount{font-family:'Archivo Black',sans-serif;font-size:44px;}
+  .price-note{font-size:13px;color:var(--muted);margin-bottom:36px;}
+
+  /* ---------- quote ---------- */
+  .quote-block{
+    padding:100px 0;
+    text-align:center;
+    border-bottom:1px solid var(--line);
+  }
+  .quote-block blockquote{
+    font-family:'Archivo Black',sans-serif;
+    font-size:clamp(24px,3.6vw,38px);
+    text-transform:none;
+    max-width:760px;
+    margin:0 auto 24px;
+    line-height:1.25;
+  }
+  .quote-block cite{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;color:var(--muted);
+    font-style:normal;
+  }
+
+  /* ---------- footer ---------- */
+  footer{padding:48px 0;}
+  .footer-row{
+    display:flex;justify-content:space-between;align-items:center;
+    flex-wrap:wrap;gap:20px;
+  }
+  .footer-links{display:flex;gap:22px;font-size:13px;color:var(--muted);}
+  .pay-row{display:flex;gap:10px;}
+  .pay-pill{
+    font-family:'IBM Plex Mono',monospace;font-size:10px;
+    border:1px solid var(--line-strong);color:var(--muted);
+    padding:5px 9px;border-radius:2px;
+  }
+  .copyright{font-size:12px;color:var(--muted);margin-top:28px;}
+
+  .reveal{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease;}
+  .reveal.in{opacity:1;transform:none;}
+
+  @media (prefers-reduced-motion: reduce){
+    .marquee-track{animation:none;}
+    .reveal{transition:none;opacity:1;transform:none;}
+    html{scroll-behavior:auto;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <div class="logo"><span class="dot"></span>IMPREXA<span style="color:var(--muted)">·</span>MX</div>
+    <nav class="nav-links">
+      <a href="#servicios">Servicios</a>
+      <a href="#proceso">Proceso</a>
+      <a href="#clientes">Clientes</a>
+      <a href="#especificaciones">Especificaciones</a>
+    </nav>
+    <a href="#cotizar" class="nav-cta">Cotizar proyecto</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="marquee">
+    <span class="marquee-track">IMPREXA MX &nbsp;·&nbsp; IMPREXA MX &nbsp;·&nbsp; IMPREXA MX &nbsp;·&nbsp; IMPREXA MX &nbsp;·&nbsp; IMPREXA MX &nbsp;·&nbsp; IMPREXA MX &nbsp;·&nbsp;</span>
+  </div>
+  <svg class="regmark corner-mark tr" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><line x1="12" y1="0" x2="12" y2="24"/><line x1="0" y1="12" x2="24" y2="12"/></svg>
+  <div class="wrap hero-inner">
+    <div class="eyebrow">PAPEL · TINTA · PRECISIÓN</div>
+    <h1 class="display">Imprime sin <span>sorpresas</span></h1>
+    <p>Imprenta digital y offset en México. Subes tu archivo, eliges papel y acabado, y nosotros nos encargamos de que llegue exactamente como lo diseñaste.</p>
+    <div class="btn-row">
+      <a href="#cotizar" class="btn btn-primary">Cotiza tu proyecto</a>
+      <a href="#servicios" class="btn btn-outline">Ver servicios</a>
+    </div>
+  </div>
+</section>
+
+<section class="pad" id="servicios">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">LO QUE HACEMOS</div>
+      <h2 class="display">Cinco formas de <em>imprimir bien</em></h2>
+    </div>
+    <div class="feature-grid reveal">
+      <div class="feature">
+        <div class="feature-badge">OF</div>
+        <div>
+          <h3>Impresión offset</h3>
+          <p>Tirajes grandes con color uniforme y el costo por pieza más bajo del mercado.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-badge">DG</div>
+        <div>
+          <h3>Impresión digital</h3>
+          <p>Tirajes cortos, datos variables y entrega rápida — sin mínimos de pedido.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-badge">GF</div>
+        <div>
+          <h3>Gran formato</h3>
+          <p>Lonas, vinil para vehículos y displays para interior y exterior.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-badge">AC</div>
+        <div>
+          <h3>Acabados especiales</h3>
+          <p>Barniz UV, laminado mate o brillante, troquelado y relieve seco.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-badge">PP</div>
+        <div>
+          <h3>Papelería corporativa</h3>
+          <p>Tarjetas, sobres y membretes con tu identidad de marca, listos para reorden.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-badge">RV</div>
+        <div>
+          <h3>Revisión de archivo</h3>
+          <p>Un especialista revisa sangrados, resolución y separación de tintas antes de imprimir.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="pad" id="proceso">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">DE TU PANTALLA AL PAPEL</div>
+      <h2 class="display">El proceso, paso a paso</h2>
+    </div>
+    <div class="process reveal">
+      <div class="step"><span class="step-num">01</span><h4>Diseño</h4><p>Nos mandas tu arte o lo creamos contigo desde cero.</p></div>
+      <div class="step"><span class="step-num">02</span><h4>Preprensa</h4><p>Revisamos sangrados, resolución y separación de tintas.</p></div>
+      <div class="step"><span class="step-num">03</span><h4>Impresión</h4><p>Offset o digital, según el tiraje y el presupuesto.</p></div>
+      <div class="step"><span class="step-num">04</span><h4>Acabado</h4><p>Corte, laminado, barniz o troquel, según el proyecto.</p></div>
+      <div class="step"><span class="step-num">05</span><h4>Entrega</h4><p>Empaque y envío a todo el país, o recoges en planta.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="pad" id="clientes">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">CONFIANZA IMPRESA</div>
+      <h2 class="display">Lo que dicen quienes ya imprimieron</h2>
+    </div>
+
+    <div class="stat-row reveal">
+      <div class="stat"><div class="num accent">2300+</div><div class="label">proyectos entregados</div></div>
+      <div class="stat"><div class="num">★★★★★ 4.9</div><div class="label">calificación promedio</div></div>
+      <div class="stat"><div class="num">24-72h</div><div class="label">tiempo de entrega típico</div></div>
+    </div>
+
+    <div class="subhead-row reveal"><span class="mono">01</span><h3>Clientes verificados · 6</h3></div>
+    <div class="review-scroll reveal">
+      <div class="review-card">
+        <div class="review-top"><div class="avatar" style="background:var(--cyan)">RM</div><div><div class="review-name">Renata Mora</div><div class="review-tag">Estudio de diseño · CDMX</div></div></div>
+        <div class="stars">★★★★★</div>
+        <p>Mandamos un tiraje de 5,000 tarjetas con barniz UV y llegaron exactamente al Pantone que pedimos. Eso casi nunca pasa.</p>
+      </div>
+      <div class="review-card">
+        <div class="review-top"><div class="avatar" style="background:var(--magenta)">JL</div><div><div class="review-name">Jorge Luna</div><div class="review-tag">Cafetería local · GDL</div></div></div>
+        <div class="stars">★★★★★</div>
+        <p>Pedimos empaques para café y vasos en gran formato. El acabado mate quedó increíble y la entrega fue puntual.</p>
+      </div>
+      <div class="review-card">
+        <div class="review-top"><div class="avatar" style="background:var(--yellow);color:#121110">CD</div><div><div class="review-name">Camila Durán</div><div class="review-tag">Marca de ropa · MTY</div></div></div>
+        <div class="stars">★★★★★</div>
+        <p>El equipo nos avisó antes de imprimir que un archivo venía en RGB en vez de CMYK. Nos salvaron de un reimpreso.</p>
+      </div>
+      <div class="review-card">
+        <div class="review-top"><div class="avatar" style="background:var(--accent)">TS</div><div><div class="review-name">Tomás Serra</div><div class="review-tag">Editorial independiente</div></div></div>
+        <div class="stars">★★★★★</div>
+        <p>Imprimimos un tiraje corto de 80 libros en offset y el costo por pieza nos sorprendió, mejor que cualquier digital.</p>
+      </div>
+      <div class="review-card">
+        <div class="review-top"><div class="avatar" style="background:var(--cyan)">NA</div><div><div class="review-name">Nadia Aguilar</div><div class="review-tag">Wedding planner</div></div></div>
+        <div class="stars">★★★★★</div>
+        <p>Invitaciones con relieve seco, quedaron de lujo. El papel Opalina era justo lo que buscaba.</p>
+      </div>
+      <div class="review-card">
+        <div class="review-top"><div class="avatar" style="background:var(--magenta)">PG</div><div><div class="review-name">Pablo Govea</div><div class="review-tag">Agencia de eventos</div></div></div>
+        <div class="stars">★★★★★</div>
+        <p>Necesitábamos lonas de último momento y las tuvimos en menos de 48 horas. Buena calidad de color también.</p>
+      </div>
+    </div>
+
+    <div class="subhead-row reveal"><span class="mono">02</span><h3>Comunidad · comentarios recientes</h3></div>
+    <div class="comment-grid reveal">
+      <div class="comment"><div class="who">@estudio.alce <span>★★★★★</span></div><p>Excelente calidad de impresión, mi nuevo proveedor fijo.</p></div>
+      <div class="comment"><div class="who">@panaderia.flor <span>★★★★★</span></div><p>Las etiquetas para empaque quedaron perfectas, gracias!</p></div>
+      <div class="comment"><div class="who">@brand.lumen <span>★★★★★</span></div><p>El acabado en relieve se ve carísimo, muy buen precio.</p></div>
+      <div class="comment"><div class="who">@cocina.del.barrio <span>★★★★★</span></div><p>Llegó un día antes de lo prometido, increíble servicio.</p></div>
+      <div class="comment"><div class="who">@taller.norte <span>★★★★★</span></div><p>Buena atención y el diseñador asignado resolvió todo.</p></div>
+      <div class="comment"><div class="who">@vino.terral <span>★★★★★</span></div><p>Las etiquetas resistieron bien la humedad del refrigerador.</p></div>
+    </div>
+
+    <div class="subhead-row reveal"><span class="mono">03</span><h3>En planta · trabajos recientes</h3></div>
+    <div class="gallery-strip reveal">
+      <div class="gallery-tile"></div><div class="gallery-tile"></div><div class="gallery-tile"></div><div class="gallery-tile"></div>
+      <div class="gallery-tile"></div><div class="gallery-tile"></div><div class="gallery-tile"></div><div class="gallery-tile"></div>
+    </div>
+  </div>
+</section>
+
+<section class="pad">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">POR QUÉ IMPREXA</div>
+      <h2 class="display">Una imprenta. <em>Todas las razones.</em></h2>
+    </div>
+    <div class="reveal" style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr><th></th><th>Imprenta tradicional</th><th>Imprenta online genérica</th><th class="win">Imprexa MX</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Precio</td><td>Variable, según volumen</td><td>Fijo, sin descuento real</td><td class="win col-win">Tarifa clara, baja con el tiraje</td></tr>
+          <tr><td>Pedido mínimo</td><td>500+ piezas</td><td>100 piezas</td><td class="win col-win">1 pieza</td></tr>
+          <tr><td>Revisión de archivo</td><td>No incluida</td><td>Automática, sin ojo humano</td><td class="win col-win">Manual, por un especialista</td></tr>
+          <tr><td>Tiempo de entrega</td><td>5–10 días</td><td>7–15 días</td><td class="win col-win">24–72 horas</td></tr>
+          <tr><td>Atención</td><td>Solo en sucursal</td><td>Chatbot</td><td class="win col-win">Diseñador asignado</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="pad">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">SIMULADOR DE TINTAS</div>
+      <h2 class="display">Mezcla tu color</h2>
+    </div>
+    <div class="mixer reveal">
+      <div class="sliders">
+        <div class="slider-row">
+          <span class="ink-dot c"></span>
+          <input type="range" id="c" min="0" max="100" value="60">
+          <span class="slider-val" id="c-val">60%</span>
+        </div>
+        <div class="slider-row">
+          <span class="ink-dot m"></span>
+          <input type="range" id="m" min="0" max="100" value="20">
+          <span class="slider-val" id="m-val">20%</span>
+        </div>
+        <div class="slider-row">
+          <span class="ink-dot y"></span>
+          <input type="range" id="y" min="0" max="100" value="10">
+          <span class="slider-val" id="y-val">10%</span>
+        </div>
+        <div class="slider-row">
+          <span class="ink-dot k"></span>
+          <input type="range" id="k" min="0" max="100" value="5">
+          <span class="slider-val" id="k-val">5%</span>
+        </div>
+      </div>
+      <div>
+        <div class="swatch-box"><div id="swatch"></div></div>
+        <div class="swatch-caption">vista previa en pantalla — el color final depende del papel y la tinta real</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="pad" id="especificaciones">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">FICHA TÉCNICA</div>
+      <h2 class="display">Especificaciones</h2>
+    </div>
+    <div class="spec-grid reveal">
+      <div class="spec-col">
+        <h4>Papeles</h4>
+        <ul><li>Couché 150–300g</li><li>Bond 90–120g</li><li>Opalina 220g</li><li>Kraft 180g</li></ul>
+      </div>
+      <div class="spec-col">
+        <h4>Formatos</h4>
+        <ul><li>Media carta / Carta</li><li>Tabloide</li><li>Gran formato (lona/vinil)</li><li>Tamaño personalizado</li></ul>
+      </div>
+      <div class="spec-col">
+        <h4>Tintas</h4>
+        <ul><li>CMYK proceso</li><li>Pantone bajo pedido</li><li>Tinta UV</li><li>Negro enriquecido</li></ul>
+      </div>
+      <div class="spec-col">
+        <h4>Acabados</h4>
+        <ul><li>Barniz UV</li><li>Laminado mate / brillante</li><li>Troquelado</li><li>Relieve seco</li></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section" id="cotizar">
+  <div class="wrap">
+    <div class="eyebrow" style="justify-content:center;">EMPIEZA TU PROYECTO</div>
+    <h2 class="display">Cotiza en menos<br>de 24 horas</h2>
+    <div class="price-row"><span class="from">desde</span><span class="amount">$0.85</span><span class="from">/ tarjeta</span></div>
+    <div class="price-note">precio final según tiraje, papel y acabado — sin costos ocultos</div>
+    <div class="btn-row" style="justify-content:center;">
+      <a href="#" class="btn btn-primary">Cotizar mi proyecto</a>
+      <a href="#" class="btn btn-outline">Hablar con un asesor</a>
+    </div>
+  </div>
+</section>
+
+<section class="quote-block">
+  <div class="wrap">
+    <svg class="regmark" viewBox="0 0 24 24" style="margin:0 auto 28px;color:var(--muted)"><circle cx="12" cy="12" r="7"/><line x1="12" y1="0" x2="12" y2="24"/><line x1="0" y1="12" x2="24" y2="12"/></svg>
+    <blockquote>"Fundamos Imprexa porque nos cansamos de las imprentas que prometen un color y entregan otro."</blockquote>
+    <cite>— EQUIPO DE PRODUCCIÓN, IMPREXA MX</cite>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-row">
+      <div class="logo" style="font-size:16px;"><span class="dot"></span>IMPREXA·MX</div>
+      <div class="footer-links">
+        <a href="#servicios">Servicios</a>
+        <a href="#proceso">Proceso</a>
+        <a href="#especificaciones">Especificaciones</a>
+        <a href="#cotizar">Cotizar</a>
+      </div>
+      <div class="pay-row">
+        <span class="pay-pill">VISA</span>
+        <span class="pay-pill">MASTERCARD</span>
+        <span class="pay-pill">PAYPAL</span>
+        <span class="pay-pill">TRANSFERENCIA</span>
+      </div>
+    </div>
+    <div class="copyright mono">© 2026 IMPREXA MX — IMPRENTA DIGITAL Y OFFSET, HECHA EN MÉXICO</div>
+  </div>
+</footer>
+
+<script>
+  // CMYK mixer
+  const ids = ['c','m','y','k'];
+  function updateSwatch(){
+    const v = {};
+    ids.forEach(id => v[id] = document.getElementById(id).value / 100);
+    const r = 255 * (1 - v.c) * (1 - v.k);
+    const g = 255 * (1 - v.m) * (1 - v.k);
+    const b = 255 * (1 - v.y) * (1 - v.k);
+    document.getElementById('swatch').style.background = `rgb(${r}, ${g}, ${b})`;
+    ids.forEach(id => {
+      document.getElementById(id + '-val').textContent = document.getElementById(id).value + '%';
+    });
+  }
+  ids.forEach(id => document.getElementById(id).addEventListener('input', updateSwatch));
+  updateSwatch();
+
+  // scroll reveal
+  if ('IntersectionObserver' in window) {
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); } });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+  } else {
+    document.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
+  }
+</script>
+
+</body>
+</html>
