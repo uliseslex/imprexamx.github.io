@@ -296,6 +296,21 @@
   .subhead-row .mono{color:var(--accent);font-size:13px;}
   .subhead-row h3{font-size:18px;}
 
+  .ig-embed{
+    position:relative;
+    width:100%;
+    max-width:960px;
+    aspect-ratio:960/529;
+    margin:0 auto;
+    border:1px solid var(--line);
+    background:var(--surface);
+  }
+  .ig-embed iframe{
+    position:absolute;inset:0;
+    width:100%;height:100%;
+    border:none;
+  }
+
   .review-scroll{
     display:flex;gap:16px;
     overflow-x:auto;
@@ -611,38 +626,10 @@
       <div class="stat"><div class="num">24-72h</div><div class="label">tiempo de entrega típico</div></div>
     </div>
 
-    <div class="subhead-row reveal"><span class="mono">01</span><h3>Clientes verificados · 6</h3></div>
-    <div class="review-scroll reveal">
-      <div class="review-card">
-        <div class="review-top"><div class="avatar" style="background:var(--cyan)">RM</div><div><div class="review-name">Daniel Ibarra</div><div class="review-tag">Estudio de diseño · CDMX</div></div></div>
-        <div class="stars">★★★★★</div>
-        <p>Mandamos un tiraje de 5,000 tarjetas con barniz UV y llegaron exactamente al Pantone que pedimos. Eso casi nunca pasa.</p>
-      </div>
-      <div class="review-card">
-        <div class="review-top"><div class="avatar" style="background:var(--magenta)">JL</div><div><div class="review-name">Jorge Luna</div><div class="review-tag">Cafetería local · GDL</div></div></div>
-        <div class="stars">★★★★★</div>
-        <p>Pedimos empaques para café y vasos en gran formato. El acabado mate quedó increíble y la entrega fue puntual.</p>
-      </div>
-      <div class="review-card">
-        <div class="review-top"><div class="avatar" style="background:var(--yellow);color:#121110">CD</div><div><div class="review-name">Camila Durán</div><div class="review-tag">Marca de ropa · MTY</div></div></div>
-        <div class="stars">★★★★★</div>
-        <p>El equipo nos avisó antes de imprimir que un archivo venía en RGB en vez de CMYK. Nos salvaron de un reimpreso.</p>
-      </div>
-      <div class="review-card">
-        <div class="review-top"><div class="avatar" style="background:var(--accent)">TS</div><div><div class="review-name">Tomás Serra</div><div class="review-tag">Editorial independiente</div></div></div>
-        <div class="stars">★★★★★</div>
-        <p>Imprimimos un tiraje corto de 80 libros en offset y el costo por pieza nos sorprendió, mejor que cualquier digital.</p>
-      </div>
-      <div class="review-card">
-        <div class="review-top"><div class="avatar" style="background:var(--cyan)">NA</div><div><div class="review-name">Nadia Aguilar</div><div class="review-tag">Wedding planner</div></div></div>
-        <div class="stars">★★★★★</div>
-        <p>Invitaciones con relieve seco, quedaron de lujo. El papel Opalina era justo lo que buscaba.</p>
-      </div>
-      <div class="review-card">
-        <div class="review-top"><div class="avatar" style="background:var(--magenta)">PG</div><div><div class="review-name">Pablo Govea</div><div class="review-tag">Agencia de eventos</div></div></div>
-        <div class="stars">★★★★★</div>
-        <p>Necesitábamos lonas de último momento y las tuvimos en menos de 48 horas. Buena calidad de color también.</p>
-      </div>
+    <div class="subhead-row reveal"><span class="mono">01</span><h3>Instagram · @imprexa.mx</h3></div>
+    <div class="ig-embed reveal">
+      <!-- SnapWidget: se actualiza solo cada vez que se publica un post nuevo en Instagram -->
+      <iframe src="https://snapwidget.com/embed/1126300" class="snapwidget-widget" allowtransparency="true" frameborder="0" scrolling="no" title="Posts from Instagram"></iframe>
     </div>
 
     <div class="subhead-row reveal"><span class="mono">02</span><h3>Comunidad · comentarios recientes</h3></div>
