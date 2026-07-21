@@ -3,23 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IMPREXA MX — Imprenta digital y offset</title>
+<title>IMPREXA MX — Playeras y tazas personalizadas</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg: #121110;
-    --surface: #1b1917;
-    --surface-2: #242220;
-    --text: #f3efe8;
-    --muted: #9c948a;
-    --accent: #ff4612;
-    --cyan: #00aeef;
+    --bg: #f7f8fb;
+    --surface: #ffffff;
+    --surface-2: #eef1f7;
+    --gray-light: #eceef1;
+    --text: #10182b;
+    --muted: #5b6478;
+    --accent: #e0202b;
+    --accent-rgb: 224,32,43;
+    --ink: #ffffff;
+    --cyan: #0d6efd;
     --magenta: #ec008c;
     --yellow: #ffe200;
-    --line: rgba(243,239,232,0.12);
-    --line-strong: rgba(243,239,232,0.22);
+    --line: rgba(16,24,43,0.10);
+    --line-strong: rgba(16,24,43,0.20);
   }
 
   *{margin:0;padding:0;box-sizing:border-box;}
@@ -38,7 +41,7 @@
 
   a{color:inherit;text-decoration:none;}
 
-  ::selection{background:var(--accent);color:#121110;}
+  ::selection{background:var(--accent);color:var(--ink);}
 
   .display{
     font-family:'Archivo Black', sans-serif;
@@ -87,7 +90,7 @@
   .halftone{
     position:absolute;
     inset:0;
-    background-image:radial-gradient(circle, rgba(243,239,232,0.16) 1px, transparent 1.4px);
+    background-image:radial-gradient(circle, rgba(16,24,43,0.16) 1px, transparent 1.4px);
     background-size:14px 14px;
     mask-image:linear-gradient(to bottom, black, transparent 85%);
     pointer-events:none;
@@ -95,24 +98,57 @@
 
   section{position:relative;}
 
+  /* ---------- scroll progress ---------- */
+  .scroll-progress{
+    position:fixed;top:0;left:0;z-index:60;
+    height:3px;width:0%;
+    background:linear-gradient(90deg, var(--cyan), var(--magenta), var(--yellow), var(--accent));
+    background-size:300% 100%;
+    animation:progress-hue 6s linear infinite;
+    transition:width .1s linear;
+  }
+  @keyframes progress-hue{
+    from{background-position:0% 0;}
+    to{background-position:300% 0;}
+  }
+
   /* ---------- header ---------- */
   header{
     position:sticky;top:0;z-index:50;
-    background:rgba(18,17,16,0.86);
+    background:rgba(255,255,255,0.82);
     backdrop-filter:blur(10px);
     border-bottom:1px solid var(--line);
+    transition:box-shadow .3s ease;
   }
+  header.scrolled{box-shadow:0 12px 30px -12px rgba(16,24,43,0.18);}
   .nav{
     display:flex;align-items:center;justify-content:space-between;
     height:72px;
+    transition:height .25s ease;
   }
+  header.scrolled .nav{height:58px;}
   .logo{
     font-family:'Archivo Black', sans-serif;
     font-size:19px;
     letter-spacing:0.01em;
     display:flex;align-items:center;gap:8px;
+    background:linear-gradient(90deg, var(--text) 0%, var(--accent) 50%, var(--text) 100%);
+    background-size:200% auto;
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    animation:logo-sheen 5s linear infinite;
   }
-  .logo .dot{width:8px;height:8px;background:var(--accent);border-radius:1px;}
+  @keyframes logo-sheen{
+    0%{background-position:0% 0;}
+    100%{background-position:-200% 0;}
+  }
+  .logo .dot{
+    width:8px;height:8px;background:var(--accent);border-radius:1px;
+    animation:dot-pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes dot-pulse{
+    0%,100%{transform:scale(1);opacity:1;}
+    50%{transform:scale(1.4);opacity:0.6;}
+  }
   .nav-links{
     display:flex;gap:36px;
     font-size:14px;font-weight:500;
@@ -121,8 +157,17 @@
     color:var(--muted);
     transition:color .2s;
     position:relative;
+    padding-bottom:4px;
+  }
+  .nav-links a::after{
+    content:"";
+    position:absolute;left:0;right:0;bottom:0;
+    height:1px;background:var(--accent);
+    transform:scaleX(0);transform-origin:right;
+    transition:transform .25s ease;
   }
   .nav-links a:hover{color:var(--text);}
+  .nav-links a:hover::after{transform:scaleX(1);transform-origin:left;}
   .nav-cta{
     font-size:13px;font-weight:600;
     padding:10px 18px;
@@ -130,12 +175,38 @@
     border-radius:2px;
     transition:border-color .2s, background .2s;
   }
-  .nav-cta:hover{border-color:var(--accent);background:rgba(255,70,18,0.08);}
-  .nav-toggle{display:none;background:none;border:none;color:var(--text);cursor:pointer;}
+  .nav-cta:hover{border-color:var(--accent);background:rgba(224,32,43,0.08);}
+  .nav-actions{display:flex;align-items:center;gap:14px;}
+  .nav-toggle{display:none;background:none;border:none;color:var(--text);cursor:pointer;padding:4px;}
+  .nav-links-cta{display:none;}
 
-  @media (max-width:760px){
-    .nav-links{display:none;}
-    .nav-toggle{display:block;}
+  @media (max-width:900px){
+    /* en móvil no cabe el botón de texto junto al logo y el menú sin
+       desbordar el header (que es sticky y queda pegado encima de todo
+       el contenido al hacer scroll) — se oculta y su acceso se mueve
+       dentro del menú desplegable como último enlace. */
+    .nav-cta{display:none;}
+    .nav-links{
+      display:none;
+      position:absolute;top:100%;left:0;right:0;
+      flex-direction:column;gap:0;
+      background:var(--surface);
+      border-bottom:1px solid var(--line);
+      padding:8px 24px 18px;
+      box-shadow:0 16px 30px -14px rgba(16,24,43,0.22);
+    }
+    .nav-links.open{display:flex;}
+    .nav-links a{padding:13px 0;border-bottom:1px solid var(--line);}
+    .nav-links a:last-child{border-bottom:none;}
+    .nav-links-cta{
+      display:block;
+      margin-top:8px;
+      text-align:center;
+      font-weight:600;
+      color:var(--accent);
+      border-bottom:none !important;
+    }
+    .nav-toggle{display:flex;align-items:center;justify-content:center;}
   }
 
   /* ---------- hero ---------- */
@@ -156,13 +227,33 @@
     font-family:'Archivo Black', sans-serif;
     font-size:120px;
     color:transparent;
-    -webkit-text-stroke:1px rgba(243,239,232,0.07);
+    -webkit-text-stroke:1px rgba(16,24,43,0.07);
     animation:scroll-left 32s linear infinite;
   }
   @keyframes scroll-left{
     from{transform:translateX(0);}
     to{transform:translateX(-50%);}
   }
+  .hero-spotlight{
+    position:absolute;inset:0;z-index:1;
+    background:radial-gradient(500px circle at var(--x,50%) var(--y,30%), rgba(224,32,43,0.14), transparent 60%);
+    pointer-events:none;
+    transition:background .1s ease;
+  }
+  .hero-shape{
+    position:absolute;
+    color:var(--line-strong);
+    opacity:0.6;
+    animation:float-shape 7s ease-in-out infinite;
+    pointer-events:none;
+  }
+  .hero-shape.shirt{top:26%;right:10%;width:90px;animation-delay:0s;}
+  .hero-shape.mug{bottom:14%;right:22%;width:56px;animation-delay:-3s;}
+  @keyframes float-shape{
+    0%,100%{transform:translateY(0) rotate(0deg);}
+    50%{transform:translateY(-16px) rotate(4deg);}
+  }
+  @media (max-width:900px){.hero-shape{display:none;}}
   .hero-inner{position:relative;z-index:2;max-width:760px;}
   .hero h1{
     font-size:clamp(48px, 8vw, 92px);
@@ -175,19 +266,41 @@
     max-width:520px;
     margin-bottom:36px;
   }
+  .hero-trust{
+    display:flex;gap:28px;flex-wrap:wrap;
+    margin-top:40px;padding-top:24px;
+    border-top:1px solid var(--line);
+  }
+  .hero-trust-item{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;letter-spacing:0.02em;
+    color:var(--muted);
+  }
+  .hero-trust-item strong{color:var(--text);font-weight:600;}
   .btn-row{display:flex;gap:14px;flex-wrap:wrap;}
   .btn{
     font-size:14px;font-weight:700;
     padding:15px 26px;
     border-radius:2px;
     display:inline-flex;align-items:center;gap:10px;
-    transition:transform .15s, opacity .15s;
+    transition:transform .15s, opacity .15s, box-shadow .2s;
+    position:relative;
+    overflow:hidden;
   }
   .btn:active{transform:scale(0.98);}
-  .btn-primary{background:var(--accent);color:#121110;}
-  .btn-primary:hover{opacity:0.88;}
+  .btn:hover{transform:translateY(-2px);}
+  .btn-primary{background:var(--accent);color:var(--ink);}
+  .btn-primary:hover{opacity:0.88;box-shadow:0 10px 24px -8px rgba(224,32,43,0.55);}
   .btn-outline{border:1px solid var(--line-strong);color:var(--text);}
   .btn-outline:hover{border-color:var(--text);}
+  .btn .ripple{
+    position:absolute;border-radius:50%;
+    background:rgba(255,255,255,0.35);
+    transform:scale(0);
+    animation:ripple-anim .6s ease-out forwards;
+    pointer-events:none;
+  }
+  @keyframes ripple-anim{to{transform:scale(1);opacity:0;}}
 
   .corner-mark{
     position:absolute;
@@ -208,6 +321,8 @@
   .section-head h2 em{font-style:normal;color:var(--accent);}
 
   section.pad{padding:96px 0;border-bottom:1px solid var(--line);}
+  section.pad.alt{background:var(--gray-light);}
+  section.pad.alt .feature,section.pad.alt .spec-col{background:var(--gray-light);}
 
   /* ---------- features ---------- */
   .feature-grid{
@@ -222,6 +337,14 @@
     padding:34px 28px;
     min-height:200px;
     display:flex;flex-direction:column;justify-content:space-between;
+    transition:transform .25s ease, background .25s ease, box-shadow .25s ease;
+    position:relative;
+  }
+  .feature:hover{
+    transform:translateY(-6px);
+    background:var(--surface);
+    box-shadow:0 18px 34px -18px rgba(16,24,43,0.18);
+    z-index:1;
   }
   .feature-badge{
     width:38px;height:38px;
@@ -231,9 +354,15 @@
     font-size:12px;
     margin-bottom:24px;
     position:relative;
+    transition:transform .3s ease, border-color .3s ease, color .3s ease;
   }
   .feature-badge::before,.feature-badge::after{
     content:"";position:absolute;background:var(--line-strong);
+  }
+  .feature:hover .feature-badge{
+    transform:rotate(-8deg) scale(1.08);
+    border-color:var(--accent);
+    color:var(--accent);
   }
   .feature h3{font-size:17px;margin-bottom:10px;}
   .feature p{color:var(--muted);font-size:14px;}
@@ -285,7 +414,7 @@
     margin-bottom:56px;
     flex-wrap:wrap;
   }
-  .stat .num{font-family:'Archivo Black',sans-serif;font-size:40px;}
+  .stat .num{font-family:'Archivo Black',sans-serif;font-size:40px;font-variant-numeric:tabular-nums;}
   .stat .num.accent{color:var(--accent);}
   .stat .label{font-size:13px;color:var(--muted);margin-top:4px;}
 
@@ -322,17 +451,19 @@
     background:var(--surface);
     border:1px solid var(--line);
     padding:24px;
+    transition:transform .25s ease, border-color .25s ease;
   }
+  .review-card:hover{transform:translateY(-4px);border-color:var(--line-strong);}
   .review-top{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
   .avatar{
     width:38px;height:38px;border-radius:50%;
     display:flex;align-items:center;justify-content:center;
     font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;
-    color:#121110;
+    color:var(--ink);
   }
   .review-name{font-size:13px;font-weight:600;}
   .review-tag{font-size:11px;color:var(--muted);}
-  .stars{color:var(--yellow);font-size:12px;letter-spacing:2px;margin-bottom:10px;}
+  .stars{color:var(--accent);font-size:12px;letter-spacing:2px;margin-bottom:10px;}
   .review-card p{font-size:13.5px;color:var(--muted);}
 
   .comment-grid{
@@ -345,7 +476,7 @@
     font-size:13px;
   }
   .comment .who{font-weight:600;font-size:12.5px;margin-bottom:4px;}
-  .comment .who span{color:var(--yellow);margin-left:6px;font-size:11px;}
+  .comment .who span{color:var(--accent);margin-left:6px;font-size:11px;}
   .comment p{color:var(--muted);}
   @media (max-width:760px){.comment-grid{grid-template-columns:1fr 1fr;}}
   @media (max-width:540px){.comment-grid{grid-template-columns:1fr;}}
@@ -361,13 +492,25 @@
     border:1px solid var(--line);
     position:relative;
     overflow:hidden;
+    transition:transform .35s ease, border-color .35s ease;
   }
   .gallery-tile::after{
     content:"▶";
     position:absolute;inset:0;
     display:flex;align-items:center;justify-content:center;
-    color:rgba(243,239,232,0.3);
+    color:rgba(16,24,43,0.3);
     font-size:11px;
+    transition:color .3s ease, background .3s ease;
+  }
+  .gallery-tile:hover{
+    transform:scale(1.06) rotate(-1deg);
+    border-color:var(--accent);
+    z-index:1;
+  }
+  .gallery-tile:hover::after{
+    color:var(--text);
+    background:rgba(224,32,43,0.18);
+    font-size:14px;
   }
   @media (max-width:860px){.gallery-strip{grid-template-columns:repeat(4,1fr);}}
   @media (max-width:540px){.gallery-strip{grid-template-columns:repeat(3,1fr);}}
@@ -392,7 +535,7 @@
   }
   tbody td.win{color:var(--text);font-weight:600;}
   tbody tr td:first-child{color:var(--text);font-weight:500;}
-  .col-win{background:rgba(255,70,18,0.06);}
+  .col-win{background:rgba(224,32,43,0.06);}
 
   /* ---------- ink mixer ---------- */
   .mixer{
@@ -401,13 +544,94 @@
     gap:60px;
     align-items:center;
   }
+  @media (max-width:760px){
+    .mixer{grid-template-columns:1fr;gap:36px;}
+  }
   .sliders{display:flex;flex-direction:column;gap:22px;}
-  .slider-row{display:grid;grid-template-columns:24px 1fr 44px;align-items:center;gap:14px;}
-  .ink-dot{width:14px;height:14px;border-radius:50%;}
-  .ink-dot.c{background:var(--cyan);}
-  .ink-dot.m{background:var(--magenta);}
-  .ink-dot.y{background:var(--yellow);}
-  .ink-dot.k{background:var(--text);}
+  .swatch-caption{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;color:var(--muted);
+    margin-top:12px;
+    text-align:center;
+  }
+  .text-input-row{margin-top:26px;}
+  .text-input-row label{
+    display:block;font-family:'IBM Plex Mono',monospace;
+    font-size:11px;color:var(--muted);
+    text-transform:uppercase;letter-spacing:0.08em;
+    margin-bottom:8px;
+  }
+  .wa-input{
+    width:100%;
+    background:var(--surface);
+    border:1px solid var(--line-strong);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+    padding:12px 14px;
+    border-radius:2px;
+    outline:none;
+    transition:border-color .2s;
+  }
+  .wa-input:focus{border-color:var(--accent);}
+  textarea.wa-input{resize:vertical;min-height:80px;}
+
+  .wa-preview-box{
+    border:1px solid var(--line-strong);
+    background:var(--surface);
+    border-radius:2px;
+    padding:28px 24px;
+    min-height:260px;
+    display:flex;flex-direction:column;
+    align-items:flex-start;
+    gap:14px;
+  }
+  .wa-preview-icon{width:34px;height:34px;color:var(--accent);flex-shrink:0;}
+  .wa-preview-label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;color:var(--muted);
+    text-transform:uppercase;letter-spacing:0.08em;
+  }
+  .wa-preview-text{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;line-height:1.7;
+    color:var(--text);
+    white-space:pre-wrap;
+    word-break:break-word;
+  }
+
+  /* ---------- 3D viewer ---------- */
+  .viewer3d-wrap{display:flex;flex-direction:column;align-items:center;}
+  .viewer3d-zones{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:20px;}
+  .viewer3d-zones button{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;font-weight:600;
+    letter-spacing:0.04em;text-transform:uppercase;
+    padding:9px 14px;
+    border:1px solid var(--line-strong);
+    background:transparent;color:var(--muted);
+    border-radius:2px;cursor:pointer;
+    transition:border-color .2s, color .2s, background .2s;
+  }
+  .viewer3d-zones button.active{
+    border-color:var(--accent);color:var(--text);
+    background:rgba(224,32,43,0.1);
+  }
+  .viewer3d-upload{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:20px;}
+  .viewer3d-upload-filename{
+    font-size:12px;color:var(--muted);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px;
+  }
+  .viewer3d-upload-clear{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;
+    background:none;border:1px solid var(--line-strong);color:var(--muted);
+    padding:8px 12px;border-radius:2px;cursor:pointer;
+    transition:border-color .2s, color .2s;
+  }
+  .viewer3d-upload-clear:hover{border-color:var(--accent);color:var(--accent);}
+  .viewer3d-adjust{width:100%;max-width:420px;margin:0 auto 20px;}
+  .adjust-row{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+  .adjust-label{width:80px;flex-shrink:0;font-size:11px;color:var(--muted);}
   input[type=range]{
     -webkit-appearance:none;
     width:100%;height:2px;
@@ -422,18 +646,29 @@
     cursor:pointer;
     border:2px solid var(--bg);
   }
-  .slider-val{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);text-align:right;}
-  .swatch-box{
-    aspect-ratio:1;
+  .viewer3d-box{
+    width:100%;max-width:520px;aspect-ratio:1;
     border:1px solid var(--line-strong);
+    background:var(--surface);
+    border-radius:2px;
     position:relative;
+    overflow:hidden;
   }
-  #swatch{width:100%;height:100%;transition:background .1s;}
-  .swatch-caption{
+  .viewer3d-box canvas{display:block;width:100%;height:100%;}
+  .viewer3d-loading{
+    position:absolute;inset:0;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'IBM Plex Mono',monospace;font-size:12px;
+    color:var(--muted);letter-spacing:0.04em;text-transform:uppercase;
+    text-align:center;padding:0 20px;
+    pointer-events:none;
+    transition:opacity .3s ease;
+  }
+  .viewer3d-loading.hidden{opacity:0;}
+  .viewer3d-caption{
     font-family:'IBM Plex Mono',monospace;
     font-size:11px;color:var(--muted);
-    margin-top:12px;
-    text-align:center;
+    margin-top:14px;text-align:center;max-width:480px;
   }
 
   /* ---------- specs ---------- */
@@ -494,14 +729,36 @@
     display:flex;justify-content:space-between;align-items:center;
     flex-wrap:wrap;gap:20px;
   }
-  .footer-links{display:flex;gap:22px;font-size:13px;color:var(--muted);}
-  .pay-row{display:flex;gap:10px;}
+  .footer-links{display:flex;flex-wrap:wrap;gap:10px 22px;font-size:13px;color:var(--muted);}
+  .pay-row{display:flex;flex-wrap:wrap;gap:10px;}
   .pay-pill{
     font-family:'IBM Plex Mono',monospace;font-size:10px;
     border:1px solid var(--line-strong);color:var(--muted);
     padding:5px 9px;border-radius:2px;
   }
   .copyright{font-size:12px;color:var(--muted);margin-top:28px;}
+
+  /* ---------- location ---------- */
+  .location-grid{
+    display:grid;
+    grid-template-columns:1fr 1.3fr;
+    gap:48px;
+    align-items:stretch;
+  }
+  .location-info{display:flex;flex-direction:column;justify-content:center;gap:18px;}
+  .location-info h3{font-size:20px;}
+  .location-info p{color:var(--muted);font-size:14px;max-width:360px;}
+  .location-info .mono{color:var(--muted);font-size:13px;}
+  .map-frame{
+    border:1px solid var(--line-strong);
+    overflow:hidden;
+    min-height:320px;
+  }
+  .map-frame iframe{width:100%;height:100%;min-height:320px;border:0;display:block;filter:grayscale(0.15) contrast(1.05);}
+  @media (max-width:860px){
+    .location-grid{grid-template-columns:1fr;}
+    .map-frame iframe{min-height:280px;}
+  }
 
   .reveal{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease;}
   .reveal.in{opacity:1;transform:none;}
@@ -510,37 +767,77 @@
     .marquee-track{animation:none;}
     .reveal{transition:none;opacity:1;transform:none;}
     html{scroll-behavior:auto;}
+    .logo,.logo .dot,.hero-shape,.scroll-progress,.review-scroll{animation:none;}
+    .feature,.feature-badge,.gallery-tile,.btn,.review-card{transition:none;}
   }
 </style>
 </head>
 <body>
 
+<div class="scroll-progress" id="scrollProgress"></div>
+
 <header>
   <div class="wrap nav">
     <div class="logo"><span class="dot"></span>IMPREXA<span style="color:var(--muted)">·</span>MX</div>
-    <nav class="nav-links">
+    <nav class="nav-links" id="navLinks">
       <a href="#servicios">Servicios</a>
       <a href="#proceso">Proceso</a>
       <a href="#clientes">Clientes</a>
       <a href="#especificaciones">Especificaciones</a>
+      <a href="#ubicacion">Ubicación</a>
+      <a href="#cotizar" class="nav-links-cta">Cotizar proyecto</a>
     </nav>
-    <a href="#cotizar" class="nav-cta">Cotizar proyecto</a>
+    <div class="nav-actions">
+      <a href="#cotizar" class="nav-cta">Cotizar proyecto</a>
+      <button type="button" class="nav-toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="navLinks">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="17" x2="21" y2="17"/></svg>
+      </button>
+    </div>
   </div>
 </header>
 
-<section class="hero">
+<section class="hero" id="heroSection">
   <div class="marquee">
     <span class="marquee-track">IMPREXA MX &nbsp;·&nbsp; IMPREXA MX &nbsp;·&nbsp; IMPREXA MX &nbsp;·&nbsp; IMPREXA MX &nbsp;·&nbsp; IMPREXA MX &nbsp;·&nbsp; IMPREXA MX &nbsp;·&nbsp;</span>
   </div>
+  <div class="hero-spotlight" id="heroSpotlight"></div>
+  <svg class="hero-shape shirt" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M22 8 L8 16 L14 26 L20 22 V56 H44 V22 L50 26 L56 16 L42 8 L36 12 H28 Z" stroke-linejoin="round"/></svg>
+  <svg class="hero-shape mug" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 14 H42 V44 A14 14 0 0 1 12 44 Z"/><path d="M42 20 H50 A8 8 0 0 1 50 36 H42"/></svg>
   <svg class="regmark corner-mark tr" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><line x1="12" y1="0" x2="12" y2="24"/><line x1="0" y1="12" x2="24" y2="12"/></svg>
   <div class="wrap hero-inner">
-    <div class="eyebrow">PAPEL · TINTA · PRECISIÓN</div>
-    <h1 class="display">Imprime sin <span>sorpresas</span></h1>
-    <p>Imprenta digital y offset en México. Subes tu archivo, eliges papel y acabado, y nosotros nos encargamos de que llegue exactamente como lo diseñaste.</p>
+    <div class="eyebrow">DISEÑA EN LÍNEA · GRATIS</div>
+    <h1 class="display">Diseña tu <span>playera o taza</span>, gratis</h1>
+    <p>Sube tu diseño, elige el color de la prenda y ajusta el tamaño, posición y rotación — ve el resultado al instante antes de pedir tu playera o taza personalizada.</p>
     <div class="btn-row">
-      <a href="#cotizar" class="btn btn-primary">Cotiza tu proyecto</a>
-      <a href="#servicios" class="btn btn-outline">Ver servicios</a>
+      <a href="#cotizar-asesor" class="btn btn-primary">Cotiza con un asesor</a>
+      <a href="#cotizar" class="btn btn-outline">Cotiza tu pedido</a>
     </div>
+    <div class="hero-trust">
+      <span class="hero-trust-item"><strong>2,300+</strong>&nbsp;playeras y tazas entregadas</span>
+      <span class="hero-trust-item"><strong>★ 4.9</strong>&nbsp;calificación promedio</span>
+      <span class="hero-trust-item"><strong>24–72h</strong>&nbsp;entrega típica</span>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section" id="cotizar">
+  <div class="wrap">
+    <div class="eyebrow" style="justify-content:center;">EMPIEZA TU PROYECTO</div>
+    <h2 class="display">Cotiza en menos<br>de 24 horas</h2>
+    <div class="price-row"><span class="from">desde</span><span class="amount">$99</span><span class="from">/ playera</span></div>
+    <div class="price-note">precio final según prenda, técnica y cantidad — sin costos ocultos</div>
+    <div class="btn-row" style="justify-content:center;">
+      <a href="#" class="btn btn-primary">Cotizar mi pedido</a>
+      <a href="#" class="btn btn-outline">Hablar con un asesor</a>
+    </div>
+  </div>
+</section>
+
+<section class="quote-block">
+  <div class="wrap">
+    <svg class="regmark" viewBox="0 0 24 24" style="margin:0 auto 28px;color:var(--muted)"><circle cx="12" cy="12" r="7"/><line x1="12" y1="0" x2="12" y2="24"/><line x1="0" y1="12" x2="24" y2="12"/></svg>
+    <blockquote>"Fundamos Imprexa porque nos cansamos de los talleres que prometen un diseño y entregan una playera despintada."</blockquote>
+    <cite>— EQUIPO DE PRODUCCIÓN, IMPREXA MX</cite>
   </div>
 </section>
 
@@ -548,104 +845,67 @@
   <div class="wrap">
     <div class="section-head reveal">
       <div class="eyebrow">LO QUE HACEMOS</div>
-      <h2 class="display">Cinco formas de <em>imprimir bien</em></h2>
+      <h2 class="display">Seis formas de <em>personalizar</em></h2>
     </div>
     <div class="feature-grid reveal">
       <div class="feature">
-        <div class="feature-badge">OF</div>
+        <div class="feature-badge">PL</div>
         <div>
-          <h3>Impresión offset</h3>
-          <p>Tirajes grandes con color uniforme y el costo por pieza más bajo del mercado.</p>
+          <h3>Playeras personalizadas</h3>
+          <p>DTF y vinil textil sobre algodón, poliéster u oversize, con tu diseño de una sola pieza a tiraje completo.</p>
         </div>
       </div>
       <div class="feature">
-        <div class="feature-badge">DG</div>
+        <div class="feature-badge">TZ</div>
         <div>
-          <h3>Impresión digital</h3>
-          <p>Tirajes cortos, datos variables y entrega rápida — sin mínimos de pedido.</p>
+          <h3>Tazas personalizadas</h3>
+          <p>Sublimación a full color en tazas cerámicas y Magic Mug — el diseño no se despinta ni se decolora.</p>
         </div>
       </div>
       <div class="feature">
-        <div class="feature-badge">GF</div>
+        <div class="feature-badge">DF</div>
         <div>
-          <h3>Gran formato</h3>
-          <p>Lonas, vinil para vehículos y displays para interior y exterior.</p>
+          <h3>DTF y sublimación</h3>
+          <p>Impresión directa a film o transferencia sublimada, ideal para colores vivos y detalles finos.</p>
         </div>
       </div>
       <div class="feature">
-        <div class="feature-badge">AC</div>
+        <div class="feature-badge">BD</div>
         <div>
-          <h3>Acabados especiales</h3>
-          <p>Barniz UV, laminado mate o brillante, troquelado y relieve seco.</p>
+          <h3>Bordado y vinil</h3>
+          <p>Logos bordados o en vinil textil de corte, con acabado más resistente para uniformes y gorras.</p>
         </div>
       </div>
       <div class="feature">
-        <div class="feature-badge">PP</div>
+        <div class="feature-badge">PR</div>
         <div>
-          <h3>Papelería corporativa</h3>
-          <p>Tarjetas, sobres y membretes con tu identidad de marca, listos para reorden.</p>
+          <h3>Kits y promocionales</h3>
+          <p>Playera + taza + termo o tote bag, con tu marca o diseño, listos para regalo o merchandising.</p>
         </div>
       </div>
       <div class="feature">
         <div class="feature-badge">RV</div>
         <div>
-          <h3>Revisión de archivo</h3>
-          <p>Un especialista revisa sangrados, resolución y separación de tintas antes de imprimir.</p>
+          <h3>Revisión de diseño</h3>
+          <p>Un especialista revisa resolución, colores y tamaño del estampado antes de prensar.</p>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<section class="pad" id="proceso">
+<section class="pad alt" id="proceso">
   <div class="wrap">
     <div class="section-head reveal">
-      <div class="eyebrow">DE TU PANTALLA AL PAPEL</div>
+      <div class="eyebrow">DE TU PANTALLA A LA PRENDA</div>
       <h2 class="display">El proceso, paso a paso</h2>
     </div>
     <div class="process reveal">
       <div class="step"><span class="step-num">01</span><h4>Diseño</h4><p>Nos mandas tu arte o lo creamos contigo desde cero.</p></div>
-      <div class="step"><span class="step-num">02</span><h4>Preprensa</h4><p>Revisamos sangrados, resolución y separación de tintas.</p></div>
-      <div class="step"><span class="step-num">03</span><h4>Impresión</h4><p>Offset o digital, según el tiraje y el presupuesto.</p></div>
-      <div class="step"><span class="step-num">04</span><h4>Acabado</h4><p>Corte, laminado, barniz o troquel, según el proyecto.</p></div>
+      <div class="step"><span class="step-num">02</span><h4>Prenda</h4><p>Eliges playera, taza u otra pieza, talla y color.</p></div>
+      <div class="step"><span class="step-num">03</span><h4>Impresión</h4><p>DTF, sublimación, vinil o bordado, según el diseño.</p></div>
+      <div class="step"><span class="step-num">04</span><h4>Prensado</h4><p>Termofijado o horneado para que el diseño no se despegue.</p></div>
       <div class="step"><span class="step-num">05</span><h4>Entrega</h4><p>Empaque y envío a todo el país, o recoges en planta.</p></div>
-    </div>
-  </div>
-</section>
-
-<section class="pad" id="clientes">
-  <div class="wrap">
-    <div class="section-head reveal">
-      <div class="eyebrow">CONFIANZA IMPRESA</div>
-      <h2 class="display">Lo que dicen quienes ya imprimieron</h2>
-    </div>
-
-    <div class="stat-row reveal">
-      <div class="stat"><div class="num accent">2300+</div><div class="label">proyectos entregados</div></div>
-      <div class="stat"><div class="num">★★★★★ 4.9</div><div class="label">calificación promedio</div></div>
-      <div class="stat"><div class="num">24-72h</div><div class="label">tiempo de entrega típico</div></div>
-    </div>
-
-    <div class="subhead-row reveal"><span class="mono">01</span><h3>Instagram · @imprexa.mx</h3></div>
-    <div class="ig-embed reveal">
-      <!-- SnapWidget: se actualiza solo cada vez que se publica un post nuevo en Instagram -->
-      <iframe src="https://snapwidget.com/embed/1126300" class="snapwidget-widget" allowtransparency="true" frameborder="0" scrolling="no" title="Posts from Instagram"></iframe>
-    </div>
-
-    <div class="subhead-row reveal"><span class="mono">02</span><h3>Comunidad · comentarios recientes</h3></div>
-    <div class="comment-grid reveal">
-      <div class="comment"><div class="who">@estudio.alce <span>★★★★★</span></div><p>Excelente calidad de impresión, mi nuevo proveedor fijo.</p></div>
-      <div class="comment"><div class="who">@panaderia.flor <span>★★★★★</span></div><p>Las etiquetas para empaque quedaron perfectas, gracias!</p></div>
-      <div class="comment"><div class="who">@brand.lumen <span>★★★★★</span></div><p>El acabado en relieve se ve carísimo, muy buen precio.</p></div>
-      <div class="comment"><div class="who">@cocina.del.barrio <span>★★★★★</span></div><p>Llegó un día antes de lo prometido, increíble servicio.</p></div>
-      <div class="comment"><div class="who">@taller.norte <span>★★★★★</span></div><p>Buena atención y el diseñador asignado resolvió todo.</p></div>
-      <div class="comment"><div class="who">@vino.terral <span>★★★★★</span></div><p>Las etiquetas resistieron bien la humedad del refrigerador.</p></div>
-    </div>
-
-    <div class="subhead-row reveal"><span class="mono">03</span><h3>En planta · trabajos recientes</h3></div>
-    <div class="gallery-strip reveal">
-      <div class="gallery-tile"></div><div class="gallery-tile"></div><div class="gallery-tile"></div><div class="gallery-tile"></div>
-      <div class="gallery-tile"></div><div class="gallery-tile"></div><div class="gallery-tile"></div><div class="gallery-tile"></div>
     </div>
   </div>
 </section>
@@ -659,12 +919,12 @@
     <div class="reveal" style="overflow-x:auto;">
       <table>
         <thead>
-          <tr><th></th><th>Imprenta tradicional</th><th>Imprenta online genérica</th><th class="win">Imprexa MX</th></tr>
+          <tr><th></th><th>Taller de estampado tradicional</th><th>Tienda online genérica</th><th class="win">Imprexa MX</th></tr>
         </thead>
         <tbody>
-          <tr><td>Precio</td><td>Variable, según volumen</td><td>Fijo, sin descuento real</td><td class="win col-win">Tarifa clara, baja con el tiraje</td></tr>
-          <tr><td>Pedido mínimo</td><td>500+ piezas</td><td>100 piezas</td><td class="win col-win">1 pieza</td></tr>
-          <tr><td>Revisión de archivo</td><td>No incluida</td><td>Automática, sin ojo humano</td><td class="win col-win">Manual, por un especialista</td></tr>
+          <tr><td>Precio</td><td>Variable, según volumen</td><td>Fijo, sin descuento real</td><td class="win col-win">Tarifa clara, baja con el pedido</td></tr>
+          <tr><td>Pedido mínimo</td><td>50+ piezas</td><td>20 piezas</td><td class="win col-win">1 pieza</td></tr>
+          <tr><td>Revisión de diseño</td><td>No incluida</td><td>Automática, sin ojo humano</td><td class="win col-win">Manual, por un especialista</td></tr>
           <tr><td>Tiempo de entrega</td><td>5–10 días</td><td>7–15 días</td><td class="win col-win">24–72 horas</td></tr>
           <tr><td>Atención</td><td>Solo en sucursal</td><td>Chatbot</td><td class="win col-win">Diseñador asignado</td></tr>
         </tbody>
@@ -673,44 +933,7 @@
   </div>
 </section>
 
-<section class="pad">
-  <div class="wrap">
-    <div class="section-head reveal">
-      <div class="eyebrow">SIMULADOR DE TINTAS</div>
-      <h2 class="display">Mezcla tu color</h2>
-    </div>
-    <div class="mixer reveal">
-      <div class="sliders">
-        <div class="slider-row">
-          <span class="ink-dot c"></span>
-          <input type="range" id="c" min="0" max="100" value="60">
-          <span class="slider-val" id="c-val">60%</span>
-        </div>
-        <div class="slider-row">
-          <span class="ink-dot m"></span>
-          <input type="range" id="m" min="0" max="100" value="20">
-          <span class="slider-val" id="m-val">20%</span>
-        </div>
-        <div class="slider-row">
-          <span class="ink-dot y"></span>
-          <input type="range" id="y" min="0" max="100" value="10">
-          <span class="slider-val" id="y-val">10%</span>
-        </div>
-        <div class="slider-row">
-          <span class="ink-dot k"></span>
-          <input type="range" id="k" min="0" max="100" value="5">
-          <span class="slider-val" id="k-val">5%</span>
-        </div>
-      </div>
-      <div>
-        <div class="swatch-box"><div id="swatch"></div></div>
-        <div class="swatch-caption">vista previa en pantalla — el color final depende del papel y la tinta real</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="pad" id="especificaciones">
+<section class="pad alt" id="especificaciones">
   <div class="wrap">
     <div class="section-head reveal">
       <div class="eyebrow">FICHA TÉCNICA</div>
@@ -718,43 +941,184 @@
     </div>
     <div class="spec-grid reveal">
       <div class="spec-col">
-        <h4>Papeles</h4>
-        <ul><li>Couché 150–300g</li><li>Bond 90–120g</li><li>Opalina 220g</li><li>Kraft 180g</li></ul>
+        <h4>Playeras</h4>
+        <ul><li>Algodón 100% / 190g</li><li>Poliéster deportivo</li><li>Oversize / boxy fit</li><li>Tallas niño a XXL</li></ul>
       </div>
       <div class="spec-col">
-        <h4>Formatos</h4>
-        <ul><li>Media carta / Carta</li><li>Tabloide</li><li>Gran formato (lona/vinil)</li><li>Tamaño personalizado</li></ul>
+        <h4>Tazas y más</h4>
+        <ul><li>Cerámica 11 oz</li><li>Magic Mug (cambia de color)</li><li>Termos y vasos</li><li>Tote bags</li></ul>
       </div>
       <div class="spec-col">
-        <h4>Tintas</h4>
-        <ul><li>CMYK proceso</li><li>Pantone bajo pedido</li><li>Tinta UV</li><li>Negro enriquecido</li></ul>
+        <h4>Técnicas</h4>
+        <ul><li>DTF (directo a film)</li><li>Sublimación full color</li><li>Vinil textil de corte</li><li>Bordado</li></ul>
       </div>
       <div class="spec-col">
         <h4>Acabados</h4>
-        <ul><li>Barniz UV</li><li>Laminado mate / brillante</li><li>Troquelado</li><li>Relieve seco</li></ul>
+        <ul><li>Prensado térmico</li><li>Resistente a lavadora</li><li>Diseño de una sola pieza</li><li>Personalización individual</li></ul>
       </div>
     </div>
   </div>
 </section>
 
-<section class="cta-section" id="cotizar">
+<section class="pad" id="clientes">
   <div class="wrap">
-    <div class="eyebrow" style="justify-content:center;">EMPIEZA TU PROYECTO</div>
-    <h2 class="display">Cotiza en menos<br>de 24 horas</h2>
-    <div class="price-row"><span class="from">desde</span><span class="amount">$0.85</span><span class="from">/ tarjeta</span></div>
-    <div class="price-note">precio final según tiraje, papel y acabado — sin costos ocultos</div>
-    <div class="btn-row" style="justify-content:center;">
-      <a href="#" class="btn btn-primary">Cotizar mi proyecto</a>
-      <a href="#" class="btn btn-outline">Hablar con un asesor</a>
+    <div class="section-head reveal">
+      <div class="eyebrow">CONFIANZA ESTAMPADA</div>
+      <h2 class="display">Lo que dicen quienes ya personalizaron</h2>
+    </div>
+
+    <div class="stat-row reveal">
+      <div class="stat"><div class="num accent">2300+</div><div class="label">playeras y tazas entregadas</div></div>
+      <div class="stat"><div class="num">★★★★★ 4.9</div><div class="label">calificación promedio</div></div>
+      <div class="stat"><div class="num">24-72h</div><div class="label">tiempo de entrega típico</div></div>
+    </div>
+
+    <div class="subhead-row reveal"><span class="mono">01</span><h3>Instagram · @imprexa.mx</h3></div>
+    <div class="ig-embed reveal">
+      <!-- SnapWidget: se actualiza solo cada vez que se publica un post nuevo en Instagram -->
+      <iframe src="https://snapwidget.com/embed/1126300" class="snapwidget-widget" allowtransparency="true" frameborder="0" scrolling="no" title="Posts from Instagram"></iframe>
+    </div>
+
+    <div class="subhead-row reveal"><span class="mono">02</span><h3>Clientes verificados · 6</h3></div>
+    <div class="review-scroll reveal">
+      <div class="review-card">
+        <div class="review-top"><div class="avatar" style="background:var(--cyan)">RM</div><div><div class="review-name">Renata Mora</div><div class="review-tag">Estudio de diseño · CDMX</div></div></div>
+        <div class="stars">★★★★★</div>
+        <p>Mandamos un pedido de 50 playeras en DTF y llegaron exactamente al color que pedimos. Eso casi nunca pasa.</p>
+      </div>
+      <div class="review-card">
+        <div class="review-top"><div class="avatar" style="background:var(--magenta)">JL</div><div><div class="review-name">Jorge Luna</div><div class="review-tag">Cafetería local · GDL</div></div></div>
+        <div class="stars">★★★★★</div>
+        <p>Pedimos tazas sublimadas con nuestro logo para vender en el mostrador. El color quedó increíble y la entrega fue puntual.</p>
+      </div>
+      <div class="review-card">
+        <div class="review-top"><div class="avatar" style="background:var(--yellow);color:var(--text)">CD</div><div><div class="review-name">Camila Durán</div><div class="review-tag">Marca de ropa · MTY</div></div></div>
+        <div class="stars">★★★★★</div>
+        <p>El equipo nos avisó antes de imprimir que el diseño venía en baja resolución. Nos salvaron de un reimpreso.</p>
+      </div>
+      <div class="review-card">
+        <div class="review-top"><div class="avatar" style="background:var(--accent)">TS</div><div><div class="review-name">Tomás Serra</div><div class="review-tag">Equipo deportivo amateur</div></div></div>
+        <div class="stars">★★★★★</div>
+        <p>Playeras con nombre y número por bordado, quedaron resistentes y el precio por pieza fue mejor que cualquier taller local.</p>
+      </div>
+      <div class="review-card">
+        <div class="review-top"><div class="avatar" style="background:var(--cyan)">NA</div><div><div class="review-name">Nadia Aguilar</div><div class="review-tag">Wedding planner</div></div></div>
+        <div class="stars">★★★★★</div>
+        <p>Tazas de recuerdo sublimadas para la boda, quedaron de lujo. El acabado Magic Mug era justo lo que buscaba.</p>
+      </div>
+      <div class="review-card">
+        <div class="review-top"><div class="avatar" style="background:var(--magenta)">PG</div><div><div class="review-name">Pablo Govea</div><div class="review-tag">Agencia de eventos</div></div></div>
+        <div class="stars">★★★★★</div>
+        <p>Necesitábamos playeras de último momento para un evento y las tuvimos en menos de 48 horas. Buena calidad de color también.</p>
+      </div>
+    </div>
+
+    <div class="subhead-row reveal"><span class="mono">03</span><h3>Comunidad · comentarios recientes</h3></div>
+    <div class="comment-grid reveal">
+      <div class="comment"><div class="who">@estudio.alce <span>★★★★★</span></div><p>Excelente calidad de estampado, mi nuevo proveedor fijo.</p></div>
+      <div class="comment"><div class="who">@panaderia.flor <span>★★★★★</span></div><p>Las tazas para regalo quedaron perfectas, gracias!</p></div>
+      <div class="comment"><div class="who">@brand.lumen <span>★★★★★</span></div><p>El bordado se ve carísimo, muy buen precio.</p></div>
+      <div class="comment"><div class="who">@cocina.del.barrio <span>★★★★★</span></div><p>Llegó un día antes de lo prometido, increíble servicio.</p></div>
+      <div class="comment"><div class="who">@taller.norte <span>★★★★★</span></div><p>Buena atención y el diseñador asignado resolvió todo.</p></div>
+      <div class="comment"><div class="who">@vino.terral <span>★★★★★</span></div><p>Las playeras resistieron bien varios lavados sin despintarse.</p></div>
+    </div>
+
+    <div class="subhead-row reveal"><span class="mono">04</span><h3>En planta · trabajos recientes</h3></div>
+    <div class="gallery-strip reveal">
+      <div class="gallery-tile"></div><div class="gallery-tile"></div><div class="gallery-tile"></div><div class="gallery-tile"></div>
+      <div class="gallery-tile"></div><div class="gallery-tile"></div><div class="gallery-tile"></div><div class="gallery-tile"></div>
     </div>
   </div>
 </section>
 
-<section class="quote-block">
+<section class="pad alt" id="visor3d">
   <div class="wrap">
-    <svg class="regmark" viewBox="0 0 24 24" style="margin:0 auto 28px;color:var(--muted)"><circle cx="12" cy="12" r="7"/><line x1="12" y1="0" x2="12" y2="24"/><line x1="0" y1="12" x2="24" y2="12"/></svg>
-    <blockquote>"Fundamos Imprexa porque nos cansamos de las imprentas que prometen un color y entregan otro."</blockquote>
-    <cite>— EQUIPO DE PRODUCCIÓN, IMPREXA MX</cite>
+    <div class="section-head reveal">
+      <div class="eyebrow">VISTA 3D INTERACTIVA</div>
+      <h2 class="display">Gira tu playera en <em>3D</em></h2>
+    </div>
+    <div class="viewer3d-wrap reveal">
+      <div class="viewer3d-zones" id="viewer3dZones" style="display:none;">
+        <button type="button" class="active" data-zone="front">Frente</button>
+        <button type="button" data-zone="back">Espalda</button>
+      </div>
+      <div class="viewer3d-upload">
+        <label class="btn btn-outline" for="viewer3dDesignInput" style="cursor:pointer;">Sube tu diseño</label>
+        <input type="file" id="viewer3dDesignInput" accept="image/*" hidden disabled>
+        <span class="viewer3d-upload-filename mono" id="viewer3dDesignFilename">Ningún archivo seleccionado</span>
+        <button type="button" id="viewer3dClearDesign" class="viewer3d-upload-clear" style="display:none;">Quitar diseño</button>
+      </div>
+      <div class="viewer3d-adjust" id="viewer3dAdjust" style="display:none;">
+        <div class="adjust-row">
+          <span class="adjust-label mono">Tamaño</span>
+          <input type="range" id="viewer3dScale" min="40" max="600" value="100">
+        </div>
+        <div class="adjust-row">
+          <span class="adjust-label mono">Horizontal</span>
+          <input type="range" id="viewer3dOffsetX" min="-50" max="50" value="0">
+        </div>
+        <div class="adjust-row">
+          <span class="adjust-label mono">Vertical</span>
+          <input type="range" id="viewer3dOffsetY" min="-50" max="50" value="0">
+        </div>
+        <button type="button" id="viewer3dResetAdjust" class="viewer3d-upload-clear">Reiniciar posición</button>
+      </div>
+      <div class="viewer3d-box" id="viewer3dContainer">
+        <div class="viewer3d-loading" id="viewer3dLoading">Cargando modelo 3D…</div>
+      </div>
+      <div class="viewer3d-caption">Arrastra para rotar · rueda del ratón para acercar o alejar — sube tu diseño y se estampa sobre la playera al instante.</div>
+    </div>
+  </div>
+</section>
+
+<section class="pad" id="cotizar-asesor">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">COTIZA CON UN ASESOR</div>
+      <h2 class="display">Arma tu pedido y mándalo por WhatsApp</h2>
+    </div>
+    <div class="mixer reveal">
+      <div class="sliders">
+        <div class="text-input-row" style="margin-top:0;">
+          <label for="wa-details">Cuéntanos qué necesitas</label>
+          <textarea id="wa-details" class="wa-input" rows="6" placeholder="Playera o taza, cantidad, colores, técnica, fecha en que lo necesitas..."></textarea>
+        </div>
+
+        <div class="btn-row" style="margin-top:8px;">
+          <a href="#" id="waSendBtn" target="_blank" rel="noopener" class="btn btn-primary">Enviar cotización por WhatsApp</a>
+        </div>
+      </div>
+      <div>
+        <div class="wa-preview-box">
+          <svg class="wa-preview-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3a9 9 0 0 0-7.75 13.5L3 21l4.6-1.21A9 9 0 1 0 12 3Z"/><path d="M8.4 8.6c.2-.4.4-.5.7-.5h.6c.2 0 .4 0 .6.4.2.4.6 1.4.7 1.6.1.2.1.3 0 .5-.1.2-.2.3-.4.5-.2.2-.3.4-.1.7.2.4.8 1.3 1.8 2.1 1.2 1 2.2 1.3 2.6 1.5.4.1.6.1.8-.1.2-.2.9-1 1.1-1.3.2-.3.5-.2.8-.1.3.1 1.9 1 2.3 1.1.4.2.6.3.7.4.1.2.1.9-.3 1.8-.4.9-1.9 1.6-2.7 1.7-.7.1-1.5.2-4.9-1.1-3.9-1.5-6.4-4.6-6.6-4.8-.2-.3-1.6-2-1.6-4 0-2 1.1-3 1.5-3.4"/></svg>
+          <div class="wa-preview-label">VISTA PREVIA DEL MENSAJE</div>
+          <div class="wa-preview-text" id="waPreviewText"></div>
+        </div>
+        <div class="swatch-caption">al enviar se abre WhatsApp con este mensaje ya escrito — solo confírmalo y mándalo</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="pad alt" id="ubicacion">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">VISÍTANOS</div>
+      <h2 class="display">Encuéntranos en <em>planta</em></h2>
+    </div>
+    <div class="location-grid reveal">
+      <div class="location-info">
+        <h3>IMPREXA MX</h3>
+        <p>Ven a ver de cerca el proceso de estampado, recoge tu pedido o platica con un asesor sobre tu proyecto.</p>
+        <div class="mono">20.6101865, -103.3948853 · Guadalajara, Jalisco</div>
+        <div class="btn-row">
+          <a href="https://maps.app.goo.gl/sdbhNpaeb855CK8V9" target="_blank" rel="noopener" class="btn btn-primary">Cómo llegar</a>
+        </div>
+      </div>
+      <div class="map-frame">
+        <iframe src="https://www.google.com/maps?q=20.6101865,-103.3948853&z=16&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Ubicación de IMPREXA MX en Google Maps"></iframe>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -766,6 +1130,7 @@
         <a href="#servicios">Servicios</a>
         <a href="#proceso">Proceso</a>
         <a href="#especificaciones">Especificaciones</a>
+        <a href="#ubicacion">Ubicación</a>
         <a href="#cotizar">Cotizar</a>
       </div>
       <div class="pay-row">
@@ -775,35 +1140,512 @@
         <span class="pay-pill">TRANSFERENCIA</span>
       </div>
     </div>
-    <div class="copyright mono">© 2026 IMPREXA MX — IMPRENTA DIGITAL Y OFFSET, HECHA EN MÉXICO</div>
+    <div class="copyright mono">© 2026 IMPREXA MX — PLAYERAS Y TAZAS PERSONALIZADAS, HECHAS EN MÉXICO</div>
   </div>
 </footer>
 
 <script>
-  // CMYK mixer
-  const ids = ['c','m','y','k'];
-  function updateSwatch(){
-    const v = {};
-    ids.forEach(id => v[id] = document.getElementById(id).value / 100);
-    const r = 255 * (1 - v.c) * (1 - v.k);
-    const g = 255 * (1 - v.m) * (1 - v.k);
-    const b = 255 * (1 - v.y) * (1 - v.k);
-    document.getElementById('swatch').style.background = `rgb(${r}, ${g}, ${b})`;
-    ids.forEach(id => {
-      document.getElementById(id + '-val').textContent = document.getElementById(id).value + '%';
-    });
-  }
-  ids.forEach(id => document.getElementById(id).addEventListener('input', updateSwatch));
-  updateSwatch();
+  // quote request -> prefilled WhatsApp message
+  const WA_NUMBER = '523337239590';
 
-  // scroll reveal
+  const waDetails = document.getElementById('wa-details');
+  const waPreviewText = document.getElementById('waPreviewText');
+  const waSendBtn = document.getElementById('waSendBtn');
+
+  function buildWaMessage(){
+    const details = waDetails.value.trim();
+    return details ? `Hola, quiero cotizar un pedido:\n${details}` : 'Hola, quiero cotizar un pedido.';
+  }
+
+  function updateWaPreview(){
+    const message = buildWaMessage();
+    waPreviewText.textContent = message;
+    waSendBtn.href = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(message)}`;
+  }
+
+  waDetails.addEventListener('input', updateWaPreview);
+
+  updateWaPreview();
+
+  // scroll reveal + animated stat counters
+  function animateCount(el){
+    const raw = el.textContent;
+    const match = raw.match(/[\d.,]+/);
+    if (!match) return;
+    const target = parseFloat(match[0].replace(/,/g, ''));
+    const suffix = raw.slice(match.index + match[0].length);
+    const prefix = raw.slice(0, match.index);
+    const duration = 1100;
+    const start = performance.now();
+    function tick(now){
+      const progress = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const value = target * eased;
+      const formatted = Number.isInteger(target) ? Math.round(value).toLocaleString('es-MX') : value.toFixed(1);
+      el.textContent = prefix + formatted + suffix;
+      if (progress < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
   if ('IntersectionObserver' in window) {
     const obs = new IntersectionObserver((entries) => {
-      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); } });
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('in');
+          if (e.target.classList.contains('stat-row')) {
+            e.target.querySelectorAll('.stat .num').forEach(animateCount);
+          }
+          obs.unobserve(e.target);
+        }
+      });
     }, { threshold: 0.12 });
     document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
   } else {
     document.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
+  }
+
+  // menú móvil
+  const navToggle = document.getElementById('navToggle');
+  const navLinksEl = document.getElementById('navLinks');
+  if (navToggle && navLinksEl) {
+    navToggle.addEventListener('click', () => {
+      const isOpen = navLinksEl.classList.toggle('open');
+      navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+    navLinksEl.querySelectorAll('a').forEach((a) => {
+      a.addEventListener('click', () => {
+        navLinksEl.classList.remove('open');
+        navToggle.setAttribute('aria-expanded', 'false');
+      });
+    });
+  }
+
+  // scroll progress bar + header shrink
+  const scrollProgress = document.getElementById('scrollProgress');
+  const header = document.querySelector('header');
+  window.addEventListener('scroll', () => {
+    const scrollTop = window.scrollY;
+    const height = document.documentElement.scrollHeight - window.innerHeight;
+    scrollProgress.style.width = (height > 0 ? (scrollTop / height) * 100 : 0) + '%';
+    header.classList.toggle('scrolled', scrollTop > 40);
+  }, { passive: true });
+
+  // hero cursor spotlight
+  const heroSection = document.getElementById('heroSection');
+  const heroSpotlight = document.getElementById('heroSpotlight');
+  if (heroSection && window.matchMedia('(hover: hover)').matches) {
+    heroSection.addEventListener('mousemove', (e) => {
+      const rect = heroSection.getBoundingClientRect();
+      heroSpotlight.style.setProperty('--x', ((e.clientX - rect.left) / rect.width) * 100 + '%');
+      heroSpotlight.style.setProperty('--y', ((e.clientY - rect.top) / rect.height) * 100 + '%');
+    });
+  }
+
+  // button ripple effect
+  document.querySelectorAll('.btn').forEach(btn => {
+    btn.addEventListener('click', function(e){
+      const rect = this.getBoundingClientRect();
+      const ripple = document.createElement('span');
+      const size = Math.max(rect.width, rect.height) * 2;
+      ripple.className = 'ripple';
+      ripple.style.width = ripple.style.height = size + 'px';
+      ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+      ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+      this.appendChild(ripple);
+      ripple.addEventListener('animationend', () => ripple.remove());
+    });
+  });
+
+  // auto-scrolling testimonials, pauses on hover/touch
+  const reviewScroll = document.querySelector('.review-scroll');
+  if (reviewScroll && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    let paused = false;
+    reviewScroll.addEventListener('mouseenter', () => paused = true);
+    reviewScroll.addEventListener('mouseleave', () => paused = false);
+    reviewScroll.addEventListener('touchstart', () => paused = true, { passive: true });
+    function autoScroll(){
+      if (!paused) {
+        reviewScroll.scrollLeft += 0.6;
+        if (reviewScroll.scrollLeft >= reviewScroll.scrollWidth - reviewScroll.clientWidth - 1) {
+          reviewScroll.scrollLeft = 0;
+        }
+      }
+      requestAnimationFrame(autoScroll);
+    }
+    requestAnimationFrame(autoScroll);
+  }
+</script>
+
+<!-- ===================================================================
+     VISOR 3D — camiseta interactiva (Three.js vía CDN + import map)
+     Bloque autocontenido: usa <script type="module">, así que sus
+     variables/const viven en el ámbito del módulo y NO chocan con el
+     <script> clásico de arriba ni con el resto del sitio.
+     =================================================================== -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+  import * as THREE from 'three';
+  import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+  import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+  const container = document.getElementById('viewer3dContainer');
+  const loadingEl = document.getElementById('viewer3dLoading');
+
+  if (container) {
+    // ---- escena, cámara, renderer ----
+    const scene = new THREE.Scene();
+    scene.background = null; // transparente: se ve el fondo de .viewer3d-box
+
+    const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
+    camera.position.set(0, 0.2, 3.2); // ZOOM inicial: ajusta el 3.2 (distancia en eje Z)
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    container.appendChild(renderer.domElement);
+
+    // ---- luces ----
+    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1.1); // luz ambiental suave
+    scene.add(hemiLight);
+
+    const keyLight = new THREE.DirectionalLight(0xffffff, 1.4); // luz principal
+    keyLight.position.set(2, 3, 2);
+    scene.add(keyLight);
+
+    const fillLight = new THREE.DirectionalLight(0xffffff, 0.5); // luz de relleno, suaviza sombras
+    fillLight.position.set(-3, 1, -2);
+    scene.add(fillLight);
+
+    // ---- controles orbitales ----
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.08;
+    controls.enablePan = false;
+    controls.minDistance = 1.5; // ZOOM mínimo permitido
+    controls.maxDistance = 6;   // ZOOM máximo permitido
+    controls.target.set(0, 0.1, 0);
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = 1.4;
+
+    // ---- modelo 3D ----
+    const MODEL_URL = './assets/models/camiseta.glb';
+
+    let shirtRoot = null;   // referencia al modelo cargado (para cambiar color/materiales)
+    let shirtMesh = null;   // el mesh real de la playera (para leer/escribir su textura)
+    let baseTexture = null; // textura original de fábrica, para poder "quitar diseño"
+    let zoneRects = null;   // { front, back } en coordenadas UV [0,1]
+    let currentZone = 'front';
+
+    let designCanvas = null;   // lienzo persistente: base + diseño compuestos
+    let designCtx = null;
+    let designTexture = null;  // CanvasTexture persistente (se actualiza, no se recrea)
+    let currentDesignImg = null; // imagen subida actualmente, para poder redibujarla al mover/escalar
+    const designTransform = { scale: 1, offsetXPct: 0, offsetYPct: 0 }; // 1 = ajustado al rect; offsets en fracción del rect
+
+    // Dispara una rejilla de rayos PARALELOS (no desde la cámara, sino directo
+    // en el espacio del modelo) contra la malla y usa dónde chocan para saber,
+    // sin datos manuales, en qué parte de la textura vive cada zona. Al no
+    // depender de la cámara, funciona sin importar cómo esté girada la playera.
+    function castZoneGrid(mesh, buildRay) {
+      const raycaster = new THREE.Raycaster();
+      let uMin = Infinity, uMax = -Infinity, vMin = Infinity, vMax = -Infinity;
+      let hits = 0;
+      const N = 6;
+      for (let i = 0; i <= N; i++) {
+        for (let j = 0; j <= N; j++) {
+          const { origin, direction } = buildRay(i / N, j / N);
+          raycaster.set(origin, direction);
+          const hit = raycaster.intersectObject(mesh, false)[0];
+          if (hit && hit.uv) {
+            uMin = Math.min(uMin, hit.uv.x);
+            uMax = Math.max(uMax, hit.uv.x);
+            vMin = Math.min(vMin, hit.uv.y);
+            vMax = Math.max(vMax, hit.uv.y);
+            hits++;
+          }
+        }
+      }
+      if (hits < 6) return null;
+      // margen de seguridad para no invadir costuras/sisas
+      const marginU = (uMax - uMin) * 0.18;
+      const marginV = (vMax - vMin) * 0.18;
+      // este modelo usa UV "envueltas" (ej. 2.25 en vez de 0.25): la tela se
+      // ve bien porque el wrap REPEAT las normaliza al pintar, pero para nuestro
+      // canvas (que sí es 0–1) hay que quitarles la parte entera aquí.
+      const wrap = (n) => ((n % 1) + 1) % 1;
+      return {
+        uMin: wrap(uMin + marginU), uMax: wrap(uMax - marginU),
+        vMin: wrap(vMin + marginV), vMax: wrap(vMax - marginV)
+      };
+    }
+
+    // Ubica las zonas imprimibles (frente, espalda) usando el tamaño ya
+    // normalizado del modelo (centrado en el origen, ver abajo).
+    function detectAllZones(mesh, finalSize) {
+      const halfX = finalSize.x / 2, halfY = finalSize.y / 2;
+      const reach = Math.max(finalSize.x, finalSize.y, finalSize.z) * 2;
+      const lerp = (a, b, t) => a + (b - a) * t;
+      const fallback = { uMin: 0.35, uMax: 0.65, vMin: 0.35, vMax: 0.65 };
+
+      // pecho/espalda: rejilla en X/Y, centrada un poco arriba de la mitad del torso
+      const torso = (zSign) => castZoneGrid(mesh, (t, s) => ({
+        origin: new THREE.Vector3(lerp(-halfX * 0.35, halfX * 0.35, t), lerp(halfY * 0.05, halfY * 0.55, s), zSign * reach),
+        direction: new THREE.Vector3(0, 0, -zSign)
+      }));
+
+      return {
+        front: torso(1) || fallback,
+        back: torso(-1) || fallback
+      };
+    }
+
+    // Redibuja el lienzo (base + diseño actual, según tamaño/posición elegidos)
+    // y avisa a three.js que la textura cambió. No crea nada nuevo: reutiliza
+    // el mismo canvas y la misma CanvasTexture para que mover/escalar sea instantáneo.
+    function redrawDesignCanvas() {
+      const designRect = zoneRects && zoneRects[currentZone];
+      if (!designCtx || !designRect) return;
+      const w = designCanvas.width;
+      const h = designCanvas.height;
+      const baseImage = baseTexture && baseTexture.image;
+      designCtx.clearRect(0, 0, w, h);
+      if (baseImage) designCtx.drawImage(baseImage, 0, 0, w, h);
+
+      if (currentDesignImg) {
+        const rectX = designRect.uMin * w;
+        const rectY = designRect.vMin * h;
+        const rectW = (designRect.uMax - designRect.uMin) * w;
+        const rectH = (designRect.vMax - designRect.vMin) * h;
+
+        const fit = Math.min(rectW / currentDesignImg.width, rectH / currentDesignImg.height) * designTransform.scale;
+        const dw = currentDesignImg.width * fit;
+        const dh = currentDesignImg.height * fit;
+        const dx = rectX + (rectW - dw) / 2 + designTransform.offsetXPct * rectW;
+        const dy = rectY + (rectH - dh) / 2 + designTransform.offsetYPct * rectH;
+
+        // en este modelo, "arriba" en la textura (V chico) cae hacia el bajo
+        // de la prenda, así que sin esto el diseño queda cabeza abajo: lo
+        // volteamos verticalmente al dibujarlo para que se vea derecho puesto.
+        designCtx.save();
+        designCtx.translate(dx, dy + dh);
+        designCtx.scale(1, -1);
+        designCtx.drawImage(currentDesignImg, 0, 0, dw, dh);
+        designCtx.restore();
+      }
+
+      designTexture.needsUpdate = true;
+    }
+
+    // Prepara (una sola vez) el lienzo y la CanvasTexture persistentes, y
+    // siempre los reconecta al material — "Quitar diseño" desconecta esta
+    // textura (vuelve a la de fábrica), así que hay que re-enchufarla cada
+    // vez que se sube un diseño nuevo, no solo la primera.
+    function ensureDesignTexture() {
+      if (!designTexture) {
+        const baseImage = baseTexture && baseTexture.image;
+        const w = (baseImage && baseImage.width) || 1024;
+        const h = (baseImage && baseImage.height) || 1024;
+
+        designCanvas = document.createElement('canvas');
+        designCanvas.width = w;
+        designCanvas.height = h;
+        designCtx = designCanvas.getContext('2d');
+
+        designTexture = new THREE.CanvasTexture(designCanvas);
+        designTexture.flipY = false; // igual que las texturas de glTF, para que coincida con el UV
+        designTexture.colorSpace = THREE.SRGBColorSpace;
+        designTexture.wrapS = baseTexture.wrapS;
+        designTexture.wrapT = baseTexture.wrapT;
+      }
+
+      shirtMesh.material.map = designTexture;
+      shirtMesh.material.needsUpdate = true;
+    }
+
+    // Carga un nuevo diseño: reinicia tamaño/posición y lo dibuja centrado.
+    function applyDesignToShirt(designImg) {
+      if (!shirtMesh || !baseTexture || !zoneRects) return;
+      currentDesignImg = designImg;
+      resetAdjustState();
+      ensureDesignTexture();
+      redrawDesignCanvas();
+    }
+
+    const loader = new GLTFLoader();
+    loader.load(
+      MODEL_URL,
+      (gltf) => {
+        shirtRoot = gltf.scene;
+
+        // centra y escala el modelo automáticamente para que quepa en el visor,
+        // sin importar el tamaño real del .glb que insertes
+        const box = new THREE.Box3().setFromObject(shirtRoot);
+        const size = box.getSize(new THREE.Vector3());
+        const center = box.getCenter(new THREE.Vector3());
+        const maxAxis = Math.max(size.x, size.y, size.z) || 1;
+        const scale = 1.6 / maxAxis;
+        shirtRoot.scale.setScalar(scale);
+        shirtRoot.position.sub(center.multiplyScalar(scale));
+
+        scene.add(shirtRoot);
+        scene.updateMatrixWorld(true);
+
+        shirtRoot.traverse((child) => {
+          if (child.isMesh && !shirtMesh) shirtMesh = child;
+        });
+        if (shirtMesh && shirtMesh.material) {
+          baseTexture = shirtMesh.material.map || null;
+        }
+
+        const finalSize = size.clone().multiplyScalar(scale);
+        zoneRects = detectAllZones(shirtMesh, finalSize);
+
+        if (designInput) designInput.disabled = false;
+        if (loadingEl) loadingEl.classList.add('hidden');
+      },
+      undefined,
+      (err) => {
+        console.error('No se pudo cargar el modelo 3D:', err);
+        if (loadingEl) loadingEl.textContent = 'No se pudo cargar el modelo 3D';
+      }
+    );
+
+    // ---- cambiar el color base de la camiseta ----
+    // Llámala desde la consola del navegador o desde tus propios botones:
+    //   setShirtColor('#e0202b');
+    window.setShirtColor = function (hexColor) {
+      if (!shirtRoot) return;
+      shirtRoot.traverse((child) => {
+        if (child.isMesh && child.material) {
+          const materials = Array.isArray(child.material) ? child.material : [child.material];
+          materials.forEach((mat) => {
+            if (mat.color) mat.color.set(hexColor);
+          });
+        }
+      });
+    };
+
+    // ---- subir diseño y estamparlo sobre la playera ----
+    const designInput = document.getElementById('viewer3dDesignInput');
+    const designFilename = document.getElementById('viewer3dDesignFilename');
+    const clearDesignBtn = document.getElementById('viewer3dClearDesign');
+    const adjustPanel = document.getElementById('viewer3dAdjust');
+    const scaleInput = document.getElementById('viewer3dScale');
+    const offsetXInput = document.getElementById('viewer3dOffsetX');
+    const offsetYInput = document.getElementById('viewer3dOffsetY');
+    const resetAdjustBtn = document.getElementById('viewer3dResetAdjust');
+    const zonesPanel = document.getElementById('viewer3dZones');
+    const zoneButtons = document.querySelectorAll('#viewer3dZones button');
+
+    function resetAdjustState() {
+      designTransform.scale = 1;
+      designTransform.offsetXPct = 0;
+      designTransform.offsetYPct = 0;
+      if (scaleInput) scaleInput.value = 100;
+      if (offsetXInput) offsetXInput.value = 0;
+      if (offsetYInput) offsetYInput.value = 0;
+    }
+
+    zoneButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        zoneButtons.forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentZone = btn.dataset.zone;
+        resetAdjustState();
+        redrawDesignCanvas();
+      });
+    });
+
+    if (designInput) {
+      designInput.addEventListener('change', () => {
+        const file = designInput.files && designInput.files[0];
+        if (!file || !shirtMesh) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            applyDesignToShirt(img);
+            designFilename.textContent = file.name;
+            clearDesignBtn.style.display = '';
+            if (adjustPanel) adjustPanel.style.display = '';
+            if (zonesPanel) zonesPanel.style.display = '';
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    if (clearDesignBtn) {
+      clearDesignBtn.addEventListener('click', () => {
+        if (!shirtMesh || !baseTexture) return;
+        currentDesignImg = null;
+        shirtMesh.material.map = baseTexture;
+        shirtMesh.material.needsUpdate = true;
+        designInput.value = '';
+        designFilename.textContent = 'Ningún archivo seleccionado';
+        clearDesignBtn.style.display = 'none';
+        if (adjustPanel) adjustPanel.style.display = 'none';
+        if (zonesPanel) zonesPanel.style.display = 'none';
+      });
+    }
+
+    // tamaño y posición: mueven/escalan el diseño ya cargado dentro de la zona del pecho
+    if (scaleInput) {
+      scaleInput.addEventListener('input', () => {
+        designTransform.scale = scaleInput.value / 100;
+        redrawDesignCanvas();
+      });
+    }
+    if (offsetXInput) {
+      offsetXInput.addEventListener('input', () => {
+        designTransform.offsetXPct = offsetXInput.value / 100;
+        redrawDesignCanvas();
+      });
+    }
+    if (offsetYInput) {
+      offsetYInput.addEventListener('input', () => {
+        designTransform.offsetYPct = offsetYInput.value / 100;
+        redrawDesignCanvas();
+      });
+    }
+    if (resetAdjustBtn) {
+      resetAdjustBtn.addEventListener('click', () => {
+        resetAdjustState();
+        redrawDesignCanvas();
+      });
+    }
+
+    // ---- tamaño responsivo ----
+    function resizeViewer() {
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      if (!w || !h) return;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h, false);
+    }
+    resizeViewer();
+    window.addEventListener('resize', resizeViewer);
+    if ('ResizeObserver' in window) {
+      new ResizeObserver(resizeViewer).observe(container);
+    }
+
+    // ---- bucle de render ----
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update(); // necesario por enableDamping y autoRotate
+      renderer.render(scene, camera);
+    }
+    animate();
   }
 </script>
 
